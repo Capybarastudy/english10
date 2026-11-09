@@ -131,7 +131,9 @@ input.field{border:2px solid var(--ink);background:var(--surface);border-radius:
 .q{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:16px}
 .q .ask{font-style:italic;font-size:18px;margin-bottom:10px}
 .opts{display:flex;flex-direction:column;gap:8px}
-.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;border:2px solid var(--line);border-radius:8px;background:var(--bg);padding:10px 12px;cursor:pointer}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;border:2px solid var(--line);border-radius:8px;background:var(--surface-2);padding:10px 12px;cursor:pointer;font-size:16px;line-height:1.45}
+.opt:hover{border-color:var(--sea)}
+.opt.on{background:#D9F1EE}
 .opt b{flex:none;width:30px;height:30px;border-radius:6px;border:2px solid var(--ink);display:grid;place-items:center}
 .opt.on{border-color:var(--sea)}
 .opt.on b{background:var(--sea);border-color:var(--sea);color:var(--sea-ink)}
