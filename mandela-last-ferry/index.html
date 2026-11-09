@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Last Ferry</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Stencil+One&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: one prison-file column; sticky header carries timer, padlocks and the door-code fragments. Limestone light / night-cell dark. */
+:root{
+  --bg:#0E3B4F; --bg2:#08283A; --on-bg:#F2F7F7; --on-bg-muted:#A8C6CC;
+  --surface:#FBFAF6; --surface-2:#E3ECEA; --ink:#14262E; --muted:#4E6268; --line:#C3D1D0;
+  --sea:#0F8B8D; --sea-ink:#FFFFFF; --coral:#F0745A; --coral-ink:#FFFFFF; --sun:#FFC845;
+  --key:#D9860F; --key-soft:#FFF0CC; --stamp:#D9453A; --stamp-soft:#FBDCD7; --ok:#24965E; --ok-soft:#D4F0E0;
+  --wall:#D8D2C4; --floor:#8C8576; --brick:#BDB5A3; --sky:#9FD8E6; --water:#1B8EA1; --mtn:#5E7A70;
+  --f-display:"Saira Stencil One","Impact","Arial Narrow",sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;-webkit-text-size-adjust:100%;background:radial-gradient(ellipse at 50% -10%,#1C6B80 0%,var(--bg) 45%,var(--bg2) 100%) fixed var(--bg);color:var(--on-bg);font-family:var(--f-body);font-size:17px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg2)}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg2);border-bottom:3px solid var(--coral);color:var(--on-bg)}
+.top-in{max-width:980px;margin:0 auto;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.brand{font-family:var(--f-display);font-size:22px;letter-spacing:.04em;line-height:1;margin-right:auto}
+.brand small{display:block;font-family:var(--f-body);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--on-bg-muted);margin-top:3px}
+.locks{display:flex;gap:4px}
+.locks svg{width:22px;height:26px}
+.frag{display:flex;gap:4px;align-items:center}
+.frag span{width:26px;height:32px;border:2px solid var(--sun);border-radius:4px;display:grid;place-items:center;font-family:var(--f-mono);font-weight:600;font-size:18px;color:var(--sun)}
+.frag span.got{background:var(--sun);color:var(--ink);box-shadow:0 0 12px rgba(255,200,69,.6)}
+.timer{font-family:var(--f-mono);font-weight:600;font-size:20px;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.12)}
+.timer.late{background:var(--stamp);color:var(--surface)}
+.timer svg{width:22px;height:22px}
+.tbtn{border:1.5px solid rgba(255,255,255,.3);background:transparent;border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer;color:var(--on-bg-muted)}
+
+main{max-width:980px;margin:0 auto;padding-block:22px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--sun);font-weight:700}
+.paper .eyebrow,.modal .eyebrow,.lock .eyebrow,.door .eyebrow{color:var(--key)}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(38px,7vw,64px);line-height:1;margin:6px 0 14px;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.5vw,40px);line-height:1.05;margin:4px 0 10px;text-wrap:balance}
+h3{font-size:18px;margin:0 0 8px}
+p{margin:0 0 12px;max-width:68ch}
+.paper,.lock,.rules div,.stats div,.q,.board,.modal,.bubble,.hint,.sent li,.steps li,.card,.dial div,.opt,.read,textarea,input,.btn,.door{color:var(--ink)}
+.story{font-size:18px}
+.paper{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:18px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.read{display:flex;gap:12px;align-items:center;background:var(--key-soft);border-left:6px solid var(--key);border-radius:6px;padding:12px 14px;font-weight:700}
+.read svg{flex:none;width:28px;height:28px;color:var(--key)}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.rules div{background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:12px;font-size:15px}
+.rules b{display:block;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--coral);margin-bottom:2px}
+.note{font-family:var(--f-mono);font-size:15px;background:var(--surface);border:1.5px dashed var(--ink);padding:16px 18px;border-radius:4px;max-width:60ch;transform:rotate(-.6deg)}
+
+.btn{border:2px solid var(--ink);background:var(--surface);border-radius:8px;padding:11px 18px;font-weight:700;cursor:pointer;min-height:48px}
+.btn.primary{background:var(--coral);border-color:var(--coral);color:var(--coral-ink);box-shadow:0 4px 0 #B84C36}
+.btn.primary:active{transform:translateY(3px);box-shadow:0 1px 0 #B84C36}
+.btn.ghost{border-color:var(--line);font-weight:400;background:var(--surface)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+input.field{border:2px solid var(--ink);background:var(--surface);border-radius:8px;padding:10px 12px;min-height:48px}
+
+/* lock */
+.lock{background:var(--surface-2);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.lock label{font-weight:700}
+.code{font-family:var(--f-mono);font-weight:600;font-size:26px;letter-spacing:.25em;text-transform:uppercase;width:min(100%,300px);text-align:center}
+.fb{min-height:1.5em;margin:0;font-weight:700}
+.fb.bad{color:var(--stamp)} .fb.good{color:var(--ok)}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
+/* hints */
+.hints{display:flex;flex-direction:column;gap:8px}
+.hint{background:var(--surface);border:2px solid var(--sun);border-radius:12px;padding:10px 14px;font-size:16px}
+.hint b{color:var(--sea)}
+
+/* room 1 table */
+.tfn{width:100%;border-collapse:collapse;font-size:16px}
+.tfn th,.tfn td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:middle}
+.tfn th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tfn td.c{width:68px;text-align:center}
+.cell{width:52px;height:44px;border:2px solid var(--line);border-radius:6px;background:var(--surface);font-family:var(--f-mono);font-weight:600;font-size:18px;cursor:pointer}
+.cell.on{border-color:var(--sea);background:var(--sea);color:var(--sea-ink)}
+.scroll{overflow-x:auto}
+
+/* room 2 cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.card{display:flex;gap:12px;align-items:flex-start;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:6px;padding:12px;cursor:pointer;min-height:96px;position:relative}
+.card .n{flex:none;width:40px;height:40px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;font-family:var(--f-mono);font-weight:600;font-size:20px}
+.card.used{opacity:.45;border-style:dashed}
+.card .ord{position:absolute;right:8px;top:6px;font-size:12px;font-weight:700;color:var(--sea)}
+
+/* room 3 steps */
+.steps{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+.steps li{display:flex;gap:12px;background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:12px 14px}
+.steps li::before{counter-increment:s;content:counter(s);flex:none;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--surface);display:grid;place-items:center;font-weight:700;font-size:15px}
+.steps li.start::before{content:"0"}
+.steps li div{min-width:0}
+
+/* room 4 board */
+.board{background:var(--surface);border:3px solid var(--ink);border-radius:4px;padding:20px 22px}
+.board-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:12px;font-family:var(--f-display);font-size:20px;letter-spacing:.03em}
+.board p{line-height:2.4;max-width:none}
+.gap{display:inline-flex;align-items:baseline;gap:4px;white-space:nowrap}
+.gap input{border:none;border-bottom:2px solid var(--ink);background:transparent;width:10.5em;padding:0 4px;font-size:17px;line-height:1.3;border-radius:0}
+.gap input.ok{border-bottom-color:var(--ok);color:var(--ok);font-weight:700}
+.gap input.no{border-bottom-color:var(--stamp);background:var(--stamp-soft)}
+.gap .pos{font-family:var(--f-mono);font-size:13px;color:var(--key);font-weight:600}
+.gap .src{font-size:14px;color:var(--muted)}
+.reveal{display:flex;gap:6px;flex-wrap:wrap}
+.reveal span{width:42px;height:50px;border:2px solid var(--line);border-radius:4px;display:grid;place-items:center;font-family:var(--f-display);font-size:28px}
+.reveal span.got{border-color:var(--ok);color:var(--ok)}
+
+/* room 5 dial */
+.dial{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.dial div{display:flex;gap:10px;align-items:center;background:var(--surface);border:1.5px solid var(--line);border-radius:999px;padding:6px 12px 6px 6px}
+.dial i{font-style:normal;width:32px;height:32px;border-radius:50%;background:var(--key);color:var(--surface);display:grid;place-items:center;font-family:var(--f-mono);font-weight:600}
+.sent{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+.sent li{background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:12px 14px}
+.blank{display:inline-block;width:7.5em;border-bottom:2px solid var(--ink);margin:0 4px}
+
+/* room 6 */
+.q{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:16px}
+.q .ask{font-style:italic;font-size:18px;margin-bottom:10px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;border:2px solid var(--line);border-radius:8px;background:var(--bg);padding:10px 12px;cursor:pointer}
+.opt b{flex:none;width:30px;height:30px;border-radius:6px;border:2px solid var(--ink);display:grid;place-items:center}
+.opt.on{border-color:var(--sea)}
+.opt.on b{background:var(--sea);border-color:var(--sea);color:var(--sea-ink)}
+.door{border:3px solid var(--ink);border-radius:6px;padding:20px;background:repeating-linear-gradient(90deg,var(--surface) 0 46px,var(--surface-2) 46px 52px)}
+.door .in{background:var(--surface);border-radius:8px;padding:16px;max-width:460px}
+
+/* modal */
+.veil{position:fixed;inset:0;background:rgba(10,16,18,.6);z-index:20;display:grid;place-items:center;padding:16px}
+.modal{background:var(--surface);border:2px solid var(--ink);border-radius:12px;max-width:520px;width:100%;padding:24px;max-height:90vh;overflow:auto}
+.big{font-family:var(--f-display);font-size:64px;line-height:1;color:var(--key)}
+.sol{font-family:var(--f-mono);font-size:14px;background:var(--surface-2);border-radius:6px;padding:10px;white-space:pre-wrap}
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+
+/* end */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stats div{background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:12px}
+.stats b{display:block;font-family:var(--f-mono);font-size:26px;font-variant-numeric:tabular-nums}
+.stats span{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+textarea{width:100%;min-height:120px;border:2px solid var(--ink);border-radius:8px;background:var(--surface);padding:10px;line-height:1.6}
+.bonus{display:flex;flex-direction:column;gap:10px}
+.bonus .row input{width:90px}
+.ok-t{color:var(--ok);font-weight:700}
+
+/* map */
+.maphead{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between}
+.maphead p{margin:0;color:var(--on-bg-muted)}
+.mapwrap{border-radius:18px;overflow:hidden;border:3px solid #0A2230;box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.mapwrap svg{display:block;width:100%;height:auto}
+.lbl{font-family:var(--f-body);font-weight:700;font-size:21px;fill:#FFFFFF;stroke:#0A2A3A;stroke-width:6px;paint-order:stroke;stroke-linejoin:round}
+.lbl.small{font-size:14px;stroke-width:4px;fill:#F4F1E8}
+.node{cursor:default}
+.node.cur,.node.done{cursor:pointer}
+.node:focus{outline:none}.node:focus-visible .ring{stroke:var(--sun)}
+.pulse{transform-box:fill-box;transform-origin:center;animation:pulse 1.8s ease-out infinite}
+@keyframes pulse{from{transform:scale(.75);opacity:.75}to{transform:scale(1.45);opacity:0}}
+.popin{transform-box:fill-box;transform-origin:center;animation:popin .7s cubic-bezier(.3,1.6,.5,1) 1.4s both}
+@keyframes popin{from{transform:scale(.3)}to{transform:none}}
+.seg{fill:none;stroke-linecap:round}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;animation:draw 1.4s ease-in-out .2s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.waves path{animation:drift 7s linear infinite}
+.waves path:nth-child(2n){animation-duration:11s;animation-direction:reverse}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-120px)}}
+.beam{transform-box:view-box;transform-origin:590px 186px;animation:beam 6s linear infinite}
+@keyframes beam{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.gull{animation:gull 22s linear infinite}
+.gull.g2{animation-duration:30s;animation-delay:-12s}
+@keyframes gull{from{transform:translateX(-80px)}to{transform:translateX(1080px)}}
+.gull path{animation:flap .5s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}
+@keyframes flap{to{transform:scaleY(.4)}}
+.peng{transform-box:fill-box;transform-origin:50% 100%;animation:waddle .5s ease-in-out infinite alternate}
+@keyframes waddle{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
+.bobf{animation:bobf 2.6s ease-in-out infinite alternate}
+@keyframes bobf{from{transform:translateY(-3px) rotate(-1deg)}to{transform:translateY(3px) rotate(1deg)}}
+#mapGuide{transition:transform 1.8s cubic-bezier(.45,0,.4,1)}
+#mapGuide:not(.walking) .legL,#mapGuide:not(.walking) .legR,#mapGuide:not(.walking) .armL,#mapGuide:not(.walking) .armR,#mapGuide:not(.walking) .bob{animation:none}
+#mapGuide.walking .legL,#mapGuide.walking .legR,#mapGuide.walking .armL,#mapGuide.walking .armR,#mapGuide.walking .bob{animation-iteration-count:infinite}
+.backmap{align-self:flex-start}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:30}
+.flash{animation:flash .5s}
+@keyframes flash{30%{box-shadow:inset 0 0 0 9999px rgba(217,69,58,.25)}}
+@media (prefers-reduced-motion:reduce){.pulse,.popin,.draw,.waves path,.beam,.gull,.gull path,.peng,.bobf,.flash{animation:none!important;stroke-dashoffset:0}#mapGuide{transition:none}}
+
+/* scene + guide */
+.scene{position:relative;display:flex;align-items:flex-end;gap:14px;min-height:250px;padding:18px 18px 0;border-radius:12px;overflow:hidden;border:2px solid var(--ink);
+  background:linear-gradient(var(--wall),var(--wall)) top/100% 78% no-repeat,linear-gradient(var(--floor),var(--floor)) bottom/100% 22% no-repeat}
+.scene::before{content:"";position:absolute;inset:0 0 22% 0;background-image:linear-gradient(var(--brick) 2px,transparent 2px),linear-gradient(90deg,var(--brick) 2px,transparent 2px);background-size:84px 34px;opacity:.55;pointer-events:none}
+.scene .bars{position:absolute;right:0;top:0;bottom:22%;width:118px;opacity:.9}
+.walker{position:relative;z-index:1;flex:none;width:118px;animation:walkIn 2.1s cubic-bezier(.3,.6,.4,1) both}
+.walker svg{display:block;width:100%;height:auto}
+.legL,.legR,.armL,.armR{transform-box:view-box}
+.legL{transform-origin:56px 146px;animation:swing .42s ease-in-out 5 alternate}
+.legR{transform-origin:64px 146px;animation:swing .42s ease-in-out 5 alternate-reverse}
+.armL{transform-origin:42px 88px;animation:swing .42s ease-in-out 5 alternate-reverse}
+.armR{transform-origin:80px 88px;animation:swing .42s ease-in-out 5 alternate}
+.wave .armR{animation:wave .6s ease-in-out 2.2s 6 alternate}
+.bob{animation:bob .42s ease-in-out 5 alternate}
+@keyframes walkIn{from{transform:translateX(-150%)}to{transform:none}}
+@keyframes swing{from{transform:rotate(-16deg)}to{transform:rotate(16deg)}}
+@keyframes wave{from{transform:rotate(-150deg)}to{transform:rotate(-110deg)}}
+@keyframes bob{from{transform:translateY(0)}to{transform:translateY(-3px)}}
+.bubble{position:relative;z-index:2;align-self:center;margin-bottom:40px;background:var(--surface);border:2.5px solid var(--ink);border-radius:16px;padding:14px 16px;font-size:17px;max-width:min(560px,100%);min-width:0;flex:1;animation:pop .45s 1.9s both}
+.bubble::before{content:"";position:absolute;left:-14px;bottom:26px;border:12px solid transparent;border-right-color:var(--ink);border-left:0}
+.bubble::after{content:"";position:absolute;left:-9px;bottom:28px;border:10px solid transparent;border-right-color:var(--surface);border-left:0}
+.bubble .who{display:block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--sea);font-weight:700;margin-bottom:2px}
+.bubble p{margin:0 0 8px}.bubble p:last-child{margin:0}
+@keyframes pop{from{opacity:0;transform:scale(.85) translateX(-10px)}to{opacity:1;transform:none}}
+.still .walker,.still .bubble,.still .legL,.still .legR,.still .armL,.still .armR,.still .bob{animation:none}
+.still .wave .armR{animation:none;transform:rotate(-130deg)}
+.hint{display:flex;gap:10px;align-items:flex-start;border-style:solid}
+.hint svg{flex:none;width:46px;height:46px}
+/* doors */
+.doorbox{display:grid;place-items:center;margin:4px 0 10px}
+.doorbox svg{width:min(240px,70vw);height:auto}
+.slide{animation:slide 1.3s cubic-bezier(.6,0,.3,1) .5s both}
+.slideL{animation:slideL 1.6s cubic-bezier(.6,0,.3,1) .6s both}
+.slideR{animation:slideR 1.6s cubic-bezier(.6,0,.3,1) .6s both}
+@keyframes slide{to{transform:translateX(172px)}}
+@keyframes slideL{to{transform:translateX(-112px)}}
+@keyframes slideR{to{transform:translateX(112px)}}
+.glow{animation:glow 1.2s 1.4s both}
+@keyframes glow{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.tag{transform-box:fill-box;transform-origin:center}
+.ferry{animation:sail 3s ease-out both}
+.ferry.away{animation:sailAway 5s ease-in both}
+@keyframes sail{from{transform:translateX(120%)}to{transform:none}}
+@keyframes sailAway{from{transform:none}to{transform:translateX(160%)}}
+.harbour{position:relative;min-height:230px;border:2px solid var(--ink);border-radius:12px;overflow:hidden;background:linear-gradient(var(--sky),var(--sky)) top/100% 60% no-repeat,linear-gradient(var(--water),var(--water)) bottom/100% 40% no-repeat;display:flex;align-items:flex-end;gap:14px;padding:18px 18px 0}
+.harbour .boat{position:absolute;right:4%;bottom:26%;width:min(260px,45%)}
+.harbour .mtn{position:absolute;right:0;left:0;bottom:40%;height:70px;width:100%}
+@media (max-width:560px){.walker{width:84px}.scene,.harbour{padding:12px 10px 0;gap:8px}.bubble{font-size:15px;margin-bottom:30px;padding:10px 12px}.scene .bars{width:70px}}
+@media (prefers-reduced-motion:reduce){.shake,.walker,.bubble,.legL,.legR,.armL,.armR,.bob,.slide,.slideL,.slideR,.glow,.ferry,.wave .armR{animation-duration:.01s!important;animation-delay:0s!important;animation-iteration-count:1!important}}
+@media (max-width:560px){.frag span{width:22px;height:28px;font-size:15px}.locks svg{width:18px;height:22px}.brand{font-size:19px}}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="top-in">
+  <div class="brand">THE LAST FERRY<small>Robben Island · Cell Block B</small></div>
+  <div class="locks" id="locks" aria-label="Locks opened"></div>
+  <div class="frag" id="frag" aria-label="Door code fragments"></div>
+  <div class="timer" id="timer" aria-live="off"></div>
+  <button class="tbtn" data-act="teacher" type="button">Teacher</button>
+</div></header>
+
+<main id="app"></main>
+<div class="veil" id="veil" hidden><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+
+<script>
+const ENC="fX0iKTUzMS5sICxyZWJtdW4gbm9zaXJwKCA0NjY2NCByb29kIGxhbmlmID4tICBBIDNRIHwgRCAyUSB8IEIgMVEiIDoiNiIgLCI0MzAyMSAgPj0gICk0KCBmbyBlc3VhY2VCIDUgfCApMyggdGFodCBvcyA0IHwgKTAoIGVyb2ZlcmVoVCAzIHwgKTIoIGVzdWFjZWIgMiB8ICkxKCBoZ3VvaHRsQSAxIiA6IjUiICwiRVBBQ1NFICA+PSAgRT1dMlsgbm9pc2ljZWQgfCBQPV0xWyBub2lzc2ltcmVwIHwgQT1dM1sgaHRhZWQgfCBDPV0xWyBub2l0YWNpbnVtbW9jIHwgUz1dNVsgcGloc2RyYWggfCBFPV04WyBlZ2FpcnJhbSIgOiI0IiAsIjQyMzIgPSApMTcubCAsJ3JhZXkgZ25pd29sbG9mIGVodCcgbm9zaXJwIG90IHRuZXMoIDErIHwgMzIzMiA9ICkwNy03Ni5sICwzNjkxIGRldHNlcnJhIDtzZ25pZGxpdWIgeW9ydHNlZCA6bWlhKCAzNjkxKyB8IDA2MyA9ICkwNi04NS5sICxnbml0b29ocyBkZXVuaXRub2MgZWNpbG9wKCAyeCB8IDA4MSA9ICkyNS0wNS5sICxzdHNldG9ycCBsdWZlY2FlcCBuaSBkZXZlaWxlYiBzeWF3bGEoIDExMSsgfCBkZWxsaWsgOTYiIDoiMyIgLCIyOTUxODMgID49ICBnbm9sZWIgdG9uIHNlb2QgKTQ2OTEgLGVmaWwgcm9mIG5vc2lycCggNCBkcmFjIHwgODQ5MSBzbmlnZWIgZGllaHRyYXBhIDIgfCA0NDkxIG55bGV2RSBzZWlycmFtIDkgfCAzNDkxIGdydWJzZW5uYWhvSiBuaSB3YWwgNSB8IDA0OTEgeXRpc3JldmludSBzZXZhZWwgMSB8IDkzOTEgZXJhSCB0cm9GIDggfCA4MTkxIG5yb2IgMyIgOiIyIiAsIkFTT0hYICA+PSAgQSA9ICkzMS0yMS5sICwnZ25peG9iIG5pIGRldHNlcmV0bmknIHlsbm8oIHR4ZXQgZWh0IG5pIHRvTiA1IHwgUyA9ICk4MS03MS5sKCBldXJUIDQgfCBPID0gKTkxLmwgLHJlaGNhZXQgc2loKCBlc2xhRiAzIHwgSCA9ICkzLTIubCggZXVyVCAyIHwgWCA9ICk0LmwgLGVtaXQgZ25vbCBhIHJvZiBsbGkgbmVlYiBkYWggZWgoIGVzbGFGIDEiIDoiMSJ7IDoibG9zIiAsIjYyMDJQQUsiIDoicmVoY2FldCIgLF1dIjAxMSIgLCI5MDEiWyAsXSIwMSJbICxdIjA4IiAsIjk3IltbIDoic3Vub2IiICwiNDY2NjQiIDoicm9vZCIgLF0iQSIgLCJEIiAsIkIiWyA6IjZyIiAsIjQzMDIxIiA6IjVyIiAsXTIgLDEgLDMgLDEgLDUgLDhbIDoic29wNHIiICxdXSJOT0lTSUNFRCJbICxdIk5PSVNTSU1SRVAiWyAsXSJIVEFFRCJbICxdIk5PSVRBQ0lOVU1NT0MiWyAsXSJTUElIU0RSQUgiICwiUElIU0RSQUgiWyAsXSJFR0FJUlJBTSJbWyA6IjRyIiAsIjQyMzIiIDoiM3IiICwiMjk1MTgzIiA6IjJyIiAsIkFTT0hYIiA6IjFyIns=";
+const D=JSON.parse(atob(ENC).split("").reverse().join(""));
+const TOTAL=40*60, KEY="lastferry-mandela-v1";
+const DIGITS=["4","6","6","6","4"];
+const fresh=()=>({screen:"intro",team:"",start:0,end:0,penalty:0,added:0,solved:[],hints:{},wrong:0,streak:{},cool:{},r1:{},r2:[],r4:{},r4ok:[],r6:{},r6ok:false,ticket:"",bonus:{},bonusOk:[]});
+let S=fresh(); let teacher=false;
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&s.screen) S=Object.assign(fresh(),s);}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=s=>document.querySelector(s);
+const norm=v=>(v||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const ICON={
+ book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 5c3-1.5 6-1.5 9 0v15c-3-1.5-6-1.5-9 0z"/><path d="M21 5c-3-1.5-6-1.5-9 0v15c3-1.5 6-1.5 9 0z"/></svg>',
+ ferry:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 15h18l-2.5 4h-13z"/><path d="M6 15V10h12v5"/><path d="M10 10V7h4v3"/></svg>',
+ lockC:c=>`<svg viewBox="0 0 22 26" aria-hidden="true"><path d="M6 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="${c}" stroke-width="2.4"/><rect x="2" y="11" width="18" height="13" rx="2" fill="${c}"/></svg>`,
+ lockO:c=>`<svg viewBox="0 0 22 26" aria-hidden="true"><path d="M6 11V7a5 5 0 0 1 10 0" fill="none" stroke="${c}" stroke-width="2.4"/><rect x="2" y="11" width="18" height="13" rx="2" fill="none" stroke="${c}" stroke-width="2.4"/></svg>`
+};
+
+/* ---------- ART ---------- */
+function guide(cls=""){
+  return `<svg viewBox="0 0 120 230" class="${cls}" aria-hidden="true">
+  <ellipse cx="60" cy="224" rx="34" ry="5" fill="#000" opacity=".18"/>
+  <g class="legR"><rect x="58" y="142" width="14" height="70" rx="6" fill="#3E4A52"/><ellipse cx="68" cy="214" rx="12" ry="6" fill="#2A2420"/></g>
+  <g class="legL"><rect x="47" y="142" width="14" height="70" rx="6" fill="#4B5861"/><ellipse cx="52" cy="214" rx="12" ry="6" fill="#2A2420"/></g>
+  <g class="bob">
+   <g class="armR"><rect x="76" y="86" width="12" height="54" rx="6" fill="#B59A63"/><circle cx="82" cy="142" r="7" fill="#7A4B2E"/></g>
+   <path d="M38 92q0-14 14-14h18q14 0 14 14v56H38z" fill="#C9AE74" stroke="#1B262B" stroke-width="2"/>
+   <path d="M52 78l9 14 9-14" fill="#F4F3EF" stroke="#1B262B" stroke-width="2"/>
+   <rect x="64" y="100" width="15" height="10" rx="2" fill="#1D6C74"/>
+   <rect x="38" y="138" width="46" height="8" fill="#5A4632"/>
+   <g class="armL"><rect x="33" y="86" width="12" height="54" rx="6" fill="#C9AE74" stroke="#1B262B" stroke-width="1.5"/><circle cx="39" cy="142" r="7" fill="#7A4B2E"/></g>
+   <rect x="55" y="66" width="12" height="14" fill="#7A4B2E"/>
+   <circle cx="61" cy="50" r="21" fill="#8A5634"/>
+   <path d="M40 46q2-20 21-20t21 20q-4-9-10-10-6 6-22 5-7 1-10 5z" fill="#D9D6CF"/>
+   <path d="M44 56q2 17 17 17t17-17q-4 8-9 8h-16q-5 0-9-8z" fill="#E6E3DC"/>
+   <path d="M53 62q8 4 16 0" fill="none" stroke="#5A3420" stroke-width="2" stroke-linecap="round"/>
+   <circle cx="53" cy="50" r="2.4" fill="#1B1B1B"/><circle cx="69" cy="50" r="2.4" fill="#1B1B1B"/>
+   <path d="M48 44h9M65 44h9" stroke="#D9D6CF" stroke-width="2.4" stroke-linecap="round"/>
+   <circle cx="40" cy="52" r="4" fill="#7A4B2E"/><circle cx="82" cy="52" r="4" fill="#7A4B2E"/>
+  </g></svg>`;
+}
+function face(){
+  return `<svg viewBox="36 24 52 52" aria-hidden="true"><circle cx="61" cy="50" r="24" fill="var(--surface-2)"/><circle cx="61" cy="50" r="21" fill="#8A5634"/><path d="M40 46q2-20 21-20t21 20q-4-9-10-10-6 6-22 5-7 1-10 5z" fill="#D9D6CF"/><path d="M44 56q2 17 17 17t17-17q-4 8-9 8h-16q-5 0-9-8z" fill="#E6E3DC"/><path d="M53 62q8 4 16 0" fill="none" stroke="#5A3420" stroke-width="2" stroke-linecap="round"/><circle cx="53" cy="50" r="2.4" fill="#1B1B1B"/><circle cx="69" cy="50" r="2.4" fill="#1B1B1B"/></svg>`;
+}
+const BARS=`<svg class="bars" viewBox="0 0 118 200" preserveAspectRatio="none" aria-hidden="true"><rect x="0" y="0" width="118" height="200" fill="var(--surface-2)" opacity=".6"/>${[8,30,52,74,96].map(x=>`<rect x="${x}" y="0" width="7" height="200" fill="var(--ink)" opacity=".75"/>`).join("")}<rect x="0" y="60" width="118" height="6" fill="var(--ink)" opacity=".75"/><rect x="0" y="140" width="118" height="6" fill="var(--ink)" opacity=".75"/></svg>`;
+function scene(html,who="Your guide · former prisoner",cls=""){
+  return `<div class="scene">${BARS}<div class="walker ${cls}">${guide()}</div><div class="bubble"><span class="who">${who}</span>${html}</div></div>`;
+}
+function cellDoor(d){
+  const bars=[14,38,62,86,110,134,158].map(x=>`<rect x="${x}" y="14" width="9" height="196" fill="#3B4449"/>`).join("");
+  return `<svg viewBox="0 0 200 224" role="img" aria-label="The cell door slides open">
+  <defs><clipPath id="cd"><rect x="10" y="10" width="180" height="204"/></clipPath><radialGradient id="lg"><stop offset="0" stop-color="#FFE7A6"/><stop offset="1" stop-color="#FFE7A6" stop-opacity="0"/></radialGradient></defs>
+  <rect x="0" y="0" width="200" height="224" rx="6" fill="#6E6A60"/><rect x="10" y="10" width="180" height="204" fill="#26302F"/>
+  <g class="glow tag"><circle cx="100" cy="110" r="70" fill="url(#lg)"/><rect x="68" y="82" width="64" height="58" rx="8" fill="#C98E2A" stroke="#7A5413" stroke-width="3"/><circle cx="100" cy="92" r="4" fill="#26302F"/><text x="100" y="132" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="34" fill="#26302F">${d}</text></g>
+  <g clip-path="url(#cd)"><g class="slide">${bars}<rect x="10" y="40" width="180" height="9" fill="#3B4449"/><rect x="10" y="176" width="180" height="9" fill="#3B4449"/><rect x="150" y="98" width="22" height="30" rx="3" fill="#8C7A4E"/></g></g></svg>`;
+}
+function gate(){
+  const half=(x0,cls)=>`<g class="${cls}">${[0,22,44,66,88].map(o=>`<rect x="${x0+o+6}" y="10" width="8" height="204" fill="#3B4449"/>`).join("")}<rect x="${x0}" y="50" width="112" height="8" fill="#3B4449"/><rect x="${x0}" y="168" width="112" height="8" fill="#3B4449"/></g>`;
+  return `<svg viewBox="0 0 224 224" role="img" aria-label="The prison gate opens to the harbour">
+  <defs><clipPath id="gc"><rect x="0" y="0" width="224" height="224"/></clipPath></defs>
+  <rect width="224" height="130" fill="#BFD9DC"/><path d="M0 130l40-40 30 22 34-46 46 50 26-18 48 32z" fill="#7E8F88"/><rect y="130" width="224" height="94" fill="#2F7F8A"/>
+  <g transform="translate(70 120)"><path d="M0 26h86l-10 16H8z" fill="#F4F3EF" stroke="#1B262B" stroke-width="2"/><rect x="18" y="10" width="46" height="16" fill="#F4F3EF" stroke="#1B262B" stroke-width="2"/><rect x="34" y="0" width="10" height="10" fill="#A8362B"/></g>
+  <g clip-path="url(#gc)">${half(0,"slideL")}${half(112,"slideR")}</g></svg>`;
+}
+function harbour(made){
+  return `<div class="harbour"><svg class="mtn" viewBox="0 0 400 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 70V40l40-12 50 6 30-30h150l30 26 50-6 50 16v30z" fill="var(--mtn)"/></svg>
+  <svg class="boat ferry ${made?"":"away"}" viewBox="0 0 160 60" aria-hidden="true"><path d="M0 30h160l-18 26H14z" fill="#F4F3EF" stroke="#1B262B" stroke-width="2.5"/><rect x="28" y="10" width="80" height="20" fill="#F4F3EF" stroke="#1B262B" stroke-width="2.5"/><rect x="36" y="15" width="10" height="8" fill="#1D6C74"/><rect x="52" y="15" width="10" height="8" fill="#1D6C74"/><rect x="68" y="15" width="10" height="8" fill="#1D6C74"/><rect x="84" y="15" width="10" height="8" fill="#1D6C74"/><rect x="56" y="0" width="14" height="10" fill="#A8362B"/></svg>
+  <div class="walker wave">${guide()}</div>
+  <div class="bubble"><span class="who">Your guide</span><p>${made?"You did it! Run – the ferry is still waiting for you. Hamba kahle – go well!":"Too late for this ferry … but you made it out. And now you know the troublemaker's story."}</p></div></div>`;
+}
+
+
+/* ---------- MAP ---------- */
+const NODES=[[200,505,"Guard's desk"],[372,430,"Cell wall"],[285,300,"Sharpeville box"],[478,335,"Museum board"],[640,455,"Director's safe"],[770,330,"The gate"]];
+const FERRY=[918,172];
+let MOVE=null;
+function nextLock(){for(let i=1;i<=6;i++)if(!S.solved.includes(i))return i;return 7}
+function waves(y,c,o){let d=`M-20 ${y}`;for(let x=-20;x<1160;x+=60)d+=` q15 -7 30 0 t30 0`;return `<path d="${d}" fill="none" stroke="${c}" stroke-width="3" opacity="${o}" stroke-linecap="round"/>`}
+function padlock(open,c){return open?`<g transform="translate(-11 -14)"><path d="M5 12V7a6 6 0 0 1 12 0" fill="none" stroke="${c}" stroke-width="3.4"/><rect x="0" y="11" width="22" height="17" rx="3" fill="${c}"/></g>`
+ :`<g transform="translate(-11 -14)"><path d="M5 12V7a6 6 0 0 1 12 0v5" fill="none" stroke="${c}" stroke-width="3.4"/><rect x="0" y="11" width="22" height="17" rx="3" fill="${c}"/></g>`}
+function nodeSVG(i,cur){
+  const [x,y,name]=NODES[i-1], done=S.solved.includes(i), isCur=i===cur;
+  const fresh=MOVE&&MOVE.to===i+1&&done;
+  let rivets="";for(let k=0;k<8;k++){const a=k*Math.PI/4;rivets+=`<circle cx="${(33*Math.cos(a)).toFixed(1)}" cy="${(33*Math.sin(a)).toFixed(1)}" r="2.6" fill="#0A2A3A" opacity=".55"/>`}
+  let inner;
+  if(done) inner=`<circle class="ring" r="40" fill="#2FB872" stroke="#0A2A3A" stroke-width="5"/>${rivets}<circle r="26" fill="#DFF7E9"/><g class="${fresh?"popin":""}"><circle cx="26" cy="-28" r="17" fill="var(--sun)" stroke="#0A2A3A" stroke-width="3"/><text x="26" y="-21" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="20" fill="#14262E">${DIGITS[i-1]}</text></g>${padlock(true,"#1E7A4C")}`;
+  else if(isCur) inner=`<circle class="pulse" r="46" fill="var(--coral)"/><circle class="ring" r="40" fill="var(--coral)" stroke="#FFFFFF" stroke-width="6"/>${rivets}<circle r="26" fill="#FFE3DA"/><text y="11" text-anchor="middle" font-family="Saira Stencil One,Impact,sans-serif" font-size="34" fill="#B84C36">${i}</text>`;
+  else inner=`<circle class="ring" r="40" fill="#5E6E76" stroke="#0A2A3A" stroke-width="5"/>${rivets}<circle r="26" fill="#8C9BA1"/>${padlock(false,"#25333A")}`;
+  const act=(done||isCur)?`data-act="room" data-n="${i}" tabindex="0" role="button"`:"";
+  return `<g class="node ${done?"done":isCur?"cur":""}" transform="translate(${x} ${y})" ${act} aria-label="Lock ${i}: ${name}${done?" (open)":isCur?" (next)":" (locked)"}">${inner}</g><text class="lbl" x="${x}" y="${y-56}" text-anchor="middle">${name}</text>`;
+}
+function mapSVG(){
+  const cur=nextLock();
+  const pts=NODES.map(n=>[n[0],n[1]]);
+  let segs="";
+  for(let i=0;i<5;i++){const [a,b]=[pts[i],pts[i+1]];const d=`M${a[0]} ${a[1]} L${b[0]} ${b[1]}`;
+    segs+=`<path class="seg" d="${d}" stroke="#0A2A3A" stroke-width="20" opacity=".35"/><path class="seg" d="${d}" stroke="#E9DDBB" stroke-width="13" stroke-dasharray="2 16"/>`;
+    if(S.solved.includes(i+2)||(S.solved.includes(i+1)&&cur===i+2)) segs+=`<path class="seg ${MOVE&&MOVE.to===i+2?"draw":""}" d="${d}" stroke="var(--sun)" stroke-width="9"/>`;}
+  const fd=`M${pts[5][0]} ${pts[5][1]} Q850 260 ${FERRY[0]-30} ${FERRY[1]+18}`;
+  segs+=`<path class="seg" d="${fd}" stroke="#FFFFFF" stroke-width="5" stroke-dasharray="10 12" opacity=".8"/>`;
+  const gx=cur<=6?NODES[cur-1][0]-68:FERRY[0]-60, gy=cur<=6?NODES[cur-1][1]+72:FERRY[1]+60;
+  return `<svg viewBox="0 0 1000 640" role="img" aria-label="Map of Robben Island with six locks">
+  <defs>
+   <linearGradient id="skyg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFE7F0"/><stop offset="1" stop-color="#F6E3B4"/></linearGradient>
+   <linearGradient id="seag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2AA3B4"/><stop offset=".55" stop-color="#16758C"/><stop offset="1" stop-color="#0D4E66"/></linearGradient>
+   <radialGradient id="landg" cx=".45" cy=".5" r=".6"><stop offset="0" stop-color="#9CC27A"/><stop offset="1" stop-color="#6E9E5A"/></radialGradient>
+   <radialGradient id="lightg"><stop offset="0" stop-color="#FFF6C8" stop-opacity=".9"/><stop offset="1" stop-color="#FFF6C8" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1000" height="120" fill="url(#skyg)"/>
+  <circle cx="860" cy="58" r="30" fill="#FFD66B"/><circle cx="860" cy="58" r="44" fill="#FFD66B" opacity=".25"/>
+  <path d="M0 120V92l40-10 30 6 40-34 220 0 34 26 50 6 30-12 50 16v30z" fill="#5E7A70"/>
+  <path d="M110 54h220l-14-8H128z" fill="#7C968B"/>
+  <g fill="#E9F1F2" opacity=".9">${[20,48,75,400,428,455,482,505].map((x,i)=>`<rect x="${x}" y="${100-(i%3)*6}" width="18" height="${20+(i%3)*6}"/>`).join("")}</g>
+  <text class="lbl small" x="220" y="80" text-anchor="middle">Table Mountain · Cape Town</text>
+  <g class="gull"><path d="M60 40q8-9 16 0q8-9 16 0" fill="none" stroke="#28343A" stroke-width="3" stroke-linecap="round"/></g>
+  <g class="gull g2"><path d="M20 72q6-7 12 0q6-7 12 0" fill="none" stroke="#28343A" stroke-width="2.5" stroke-linecap="round"/></g>
+  <rect y="118" width="1000" height="522" fill="url(#seag)"/>
+  <g class="waves">${waves(140,"#FFFFFF",.35)}${waves(330,"#BDEFF5",.18)}${waves(470,"#BDEFF5",.15)}${waves(612,"#BDEFF5",.15)}</g>
+  <path d="M70 300C80 185 300 150 520 158 700 162 850 150 905 232c45 95 25 230-45 320-100 70-410 70-600 45C120 580 60 430 70 300z" fill="#EAD39A" stroke="#F6E7BF" stroke-width="6"/>
+  <path d="M100 302C110 205 310 182 520 188 690 192 830 186 875 245c38 85 20 205-40 285-90 58-390 58-570 36C140 545 90 420 100 302z" fill="url(#landg)"/>
+  ${[[150,250],[230,215],[420,215],[700,225],[820,300],[850,420],[560,560],[330,580],[130,420],[690,560]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="13" fill="#4F7F45"/><circle cx="${x+10}" cy="${y+4}" r="9" fill="#5D8F50"/>`).join("")}
+  <g><rect x="92" y="445" width="96" height="58" rx="3" fill="#C9CBC5" stroke="#4A5459" stroke-width="3"/><rect x="100" y="455" width="80" height="10" fill="#8E9A9F"/><rect x="100" y="475" width="80" height="10" fill="#8E9A9F"/>
+   <rect x="232" y="528" width="96" height="46" rx="3" fill="#C9CBC5" stroke="#4A5459" stroke-width="3"/><rect x="240" y="538" width="80" height="9" fill="#8E9A9F"/>
+   <path d="M86 440h108M226 522h108" stroke="#4A5459" stroke-width="3"/>
+   <text class="lbl small" x="140" y="530" text-anchor="middle">Prison</text></g>
+  <g><ellipse cx="455" cy="535" rx="66" ry="30" fill="#F3F1EA" stroke="#C9C3B2" stroke-width="3"/><path d="M405 535q50 18 100 0M420 524q35 10 70 0" stroke="#D8D2C2" stroke-width="3" fill="none"/><text class="lbl small" x="455" y="590" text-anchor="middle">Limestone quarry</text></g>
+  <g><polygon class="beam" points="590,186 760,150 760,222" fill="url(#lightg)"/><path d="M580 236l4-50h12l4 50z" fill="#FFFFFF" stroke="#4A5459" stroke-width="2.5"/><rect x="582.5" y="200" width="15" height="8" fill="#D9453A"/><rect x="581" y="220" width="18" height="8" fill="#D9453A"/><rect x="582" y="174" width="16" height="13" fill="#FFF3A8" stroke="#4A5459" stroke-width="2.5"/><path d="M579 174l11-9 11 9z" fill="#D9453A"/><text class="lbl small" x="590" y="258" text-anchor="middle">Lighthouse</text></g>
+  <path d="M868 218 L 955 196" stroke="#8B6B43" stroke-width="10" stroke-linecap="round"/><path d="M868 218 L 955 196" stroke="#B58C5A" stroke-width="5" stroke-dasharray="4 6"/>
+  ${segs}
+  <g class="bobf"><g transform="translate(${FERRY[0]-58} ${FERRY[1]-36})"><path d="M0 34h116l-18 26H14z" fill="#FFFFFF" stroke="#14262E" stroke-width="3"/><path d="M4 44h108" stroke="var(--coral)" stroke-width="6"/><rect x="22" y="12" width="62" height="22" rx="3" fill="#FFFFFF" stroke="#14262E" stroke-width="3"/><rect x="30" y="18" width="10" height="9" fill="#2AA3B4"/><rect x="46" y="18" width="10" height="9" fill="#2AA3B4"/><rect x="62" y="18" width="10" height="9" fill="#2AA3B4"/><rect x="44" y="0" width="14" height="12" fill="var(--coral)" stroke="#14262E" stroke-width="2.5"/></g></g>
+  <text class="lbl" x="${FERRY[0]-2}" y="${FERRY[1]+60}" text-anchor="middle">Last ferry</text>
+  ${[[808,566],[832,574],[852,562]].map(([x,y],i)=>`<g class="peng" style="animation-delay:${i*-.17}s"><ellipse cx="${x}" cy="${y-10}" rx="9" ry="13" fill="#1E2428"/><ellipse cx="${x}" cy="${y-7}" rx="5.5" ry="9" fill="#FFFFFF"/><circle cx="${x}" cy="${y-24}" r="6.5" fill="#1E2428"/><path d="M${x+5} ${y-24}l7 2-7 2z" fill="#F0A22A"/><path d="M${x-5} ${y+2}h4M${x+1} ${y+2}h4" stroke="#F0A22A" stroke-width="3"/></g>`).join("")}
+  <text class="lbl small" x="830" y="602" text-anchor="middle">African penguins</text>
+  ${NODES.map((n,i)=>nodeSVG(i+1,cur)).join("")}
+  <g id="mapGuide" style="transform:translate(${gx}px,${gy}px)"><svg x="-28" y="-104" width="56" height="108" viewBox="0 0 120 230">${guide().replace(/^<svg[^>]*>/,"").replace(/<\/svg>$/,"")}</svg></g>
+  </svg>`;
+}
+function mapView(){
+  const cur=nextLock();
+  const t=cur<=6?ROOMS[cur-1].t:"";
+  return `<section class="stack"><div class="maphead"><div><div class="eyebrow">Robben Island · your way out</div><h2>Island map</h2><p>${cur<=6?`Next: Lock ${cur} – ${t}. Tap the glowing lock.`:"All locks are open!"}</p></div>
+  ${cur<=6?`<button class="btn primary" type="button" data-act="room" data-n="${cur}">Go to lock ${cur}</button>`:""}</div>
+  <div class="mapwrap">${mapSVG()}</div></section>`;
+}
+function afterMap(){
+  if(!MOVE)return;const g=document.getElementById("mapGuide");if(!g){MOVE=null;return}
+  const f=NODES[MOVE.to-2],t=MOVE.to<=6?NODES[MOVE.to-1]:null;
+  const to=g.style.transform;
+  g.style.transition="none";g.style.transform=`translate(${f[0]-68}px,${f[1]+72}px)`;void g.getBoundingClientRect();
+  g.classList.add("walking");
+  setTimeout(()=>{g.style.transition="";g.style.transform=to;},350);
+  setTimeout(()=>g.classList.remove("walking"),2300);
+  MOVE=null;
+}
+function confetti(){
+  if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const c=document.createElement("canvas");c.id="confetti";document.body.appendChild(c);
+  const x=c.getContext("2d"),W=c.width=innerWidth,H=c.height=innerHeight;
+  const cols=["#F0745A","#FFC845","#2FB872","#2AA3B4","#FFFFFF"];
+  const P=Array.from({length:140},()=>({x:W/2,y:H*.35,vx:(Math.random()-.5)*16,vy:-Math.random()*14-4,r:Math.random()*6+4,c:cols[Math.random()*5|0],a:Math.random()*6,s:(Math.random()-.5)*.3}));
+  let t=0;(function f(){x.clearRect(0,0,W,H);P.forEach(p=>{p.vy+=.45;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.a+=p.s;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);x.restore()});if(++t<120)requestAnimationFrame(f);else c.remove()})();
+}
+
+/* ---------- ROOMS ---------- */
+const ROOMS=[
+{t:"The name on the file", say:"<p>Ah, you found my old desk! That file belongs to a famous prisoner – but someone has blacked out his first name.</p><p>The password is the <b>language</b> his first name comes from. Read the first part of the text and decide about my five statements.</p>", read:"Book p. 23 · lines 1–23 · paragraphs A and B",
+ story:"A dusty prison file lies on the guard's desk. The prisoner's first name has been blacked out. The file only opens with a password: the language that his first name comes from.",
+ hints:["Statement 1: read lines 4–5 very carefully. Statement 5: does the text say anything about competitions – or only about an interest?","The password starts with X and H."]},
+{t:"Scratches on the wall", say:"<p>We prisoners scratched days and events into these walls. Look – someone wrote down Mandela's early life, but all mixed up.</p><p>Put the events in order and tap the cards. But careful: <b>one card doesn't belong</b> to his first 30 years.</p>", read:"Book pp. 23–24 · lines 7–72",
+ story:"Someone has scratched events from Mandela's early life into the cell wall – but in the wrong order. Each scratch has a number.",
+ hints:["One card describes something that happened in 1964. When was Mandela sent to prison for life? Lines 70–72.","The code starts with 3 and 8."]},
+{t:"The Sharpeville file", say:"<p>This box is about a terrible day in 1960. The guards locked it with a four-digit code.</p><p>Follow the steps. Every step has two paths – the text tells you which one is true. Then do the maths.</p>", read:"Book p. 24 · lines 42–72 · paragraph D",
+ story:"A metal box with a four-digit lock. Inside the lid, a guard left a list of instructions. Every step depends on a fact from the text – choose the right path, then do the maths.",
+ hints:["Step 1: lines 50–53. What had Mandela ALWAYS believed in, before he changed his opinion?","After step 2 your number is 360."]},
+{t:"The museum board", say:"<p>Today our prison is a museum. But somebody damaged this information board – six words are missing.</p><p>Repair them with words from the same <b>word family</b>. Spell them perfectly, or the letters won't work!</p>", read:"Book pp. 24–25 · lines 73–100 · paragraph E",
+ story:"The museum's information board has lost some words. Repair it and it will show you a password.",
+ hints:["All six answers are nouns. Spelling counts – count the letters carefully, e.g. [3] means the third letter of your word.","Gap 1 is 'marriage', gap 6 is 'decision'."]},
+{t:"The safe in the office", say:"<p>The prison director's safe! I never saw it open in all my years here.</p><p>Each linking word on the dial has a number. Find the right word for each sentence – it must fit the <b>meaning and the grammar</b>.</p>", read:"Book p. 25 · lines 101–115 · paragraph F",
+ story:"A safe with a number dial. Next to it, five sentences about Mandela's release – the linking words are missing. Every linking word on the dial has a number.",
+ hints:["Sentence 5: the gap is followed by a noun phrase ('their hard work'), not a full sentence. Sentence 3: the gap starts a new sentence after a full stop.","The code starts with 1, 2, 0."]},
+{t:"The last tourist", say:"<p>Look – a German tourist outside the door. She has the key, but she couldn't follow the English tour.</p><p>Help her understand the last part of Mandela's story. <b>Choose the best German answers</b> – she is very picky!</p>", read:"Book p. 25 · lines 116–144 · paragraph G",
+ story:"You can see the harbour through the bars. A German tourist is standing outside the door – she couldn't follow the English tour and asks you for help. Only when she is happy will she open the door from outside.",
+ hints:["A good answer gives the key information, is correct, and sounds like natural German – no word-for-word translation. Watch out for information from other paragraphs.","Answer to the third question: A."]}
+];
+
+function lockArea(n,label,ph,mode){
+  const cool=S.cool[n]&&S.cool[n]>Date.now();
+  return `<div class="lock"><label for="code${n}">${label}</label>
+  <div class="row"><input class="field code" id="code${n}" autocomplete="off" autocapitalize="characters" spellcheck="false" ${mode==="num"?'inputmode="numeric"':''} placeholder="${ph}" ${cool?"disabled":""}>
+  <button class="btn primary" type="button" data-act="unlock" data-n="${n}" ${cool?"disabled":""}>Unlock</button></div>
+  <p class="fb" id="fb${n}" role="status">${cool?"The guard is watching you. Wait a moment …":""}</p></div>`;
+}
+function hintArea(n){
+  const h=S.hints[n]||0, r=ROOMS[n-1];
+  let out=`<div class="hints">`;
+  if(h>=1) out+=`<div class="hint">${face()}<div><b>Hint 1:</b> ${r.hints[0]}</div></div>`;
+  if(h>=2) out+=`<div class="hint">${face()}<div><b>Hint 2:</b> ${r.hints[1]}</div></div>`;
+  if(h<2) out+=`<div class="row"><button class="btn ghost" type="button" data-act="hint" data-n="${n}">Get hint ${h+1} (costs ${h===0?1:2} min)</button></div>`;
+  return out+`</div>`;
+}
+function shell(n,inner){
+  const r=ROOMS[n-1];
+  return `<section class="stack">
+   <button class="btn ghost backmap" type="button" data-act="map">← Island map</button>
+   <div><div class="eyebrow">Lock ${n} of 6</div><h2>${r.t}</h2></div>
+   ${scene(r.say)}
+   <div class="read">${ICON.book}<span>Read first: ${r.read}</span></div>
+   ${inner}${hintArea(n)}</section>`;
+}
+
+const R={};
+R[1]=()=>{
+  const rows=[["When Mandela died, nobody had expected it because nobody knew he was ill.","K","X","Z"],
+   ["The President of South Africa told the public that Mandela had died.","H","R","M"],
+   ["Mandela's father gave him the name 'Nelson'.","E","O","U"],
+   ["None of Mandela's brothers and sisters had gone to school before him.","S","L","W"],
+   ["As a young man, Mandela won several boxing competitions.","I","E","A"]];
+  let t=`<div class="paper"><h3>Decide: true, false or not in the text? Each answer gives you a letter. Read the letters from top to bottom.</h3>
+  <div class="scroll"><table class="tfn"><thead><tr><th>Statement</th><th class="c">True</th><th class="c">False</th><th class="c">Not in text</th></tr></thead><tbody>`;
+  rows.forEach((r,i)=>{t+=`<tr><td>${i+1}. ${r[0]}</td>`;[1,2,3].forEach(k=>{t+=`<td class="c"><button type="button" class="cell ${S.r1[i]===k?"on":""}" data-act="r1" data-i="${i}" data-k="${k}" aria-label="Statement ${i+1}: ${["","true","false","not in text"][k]}">${r[k]}</button></td>`});t+=`</tr>`});
+  t+=`</tbody></table></div></div>`;
+  return shell(1,t+lockArea(1,"Password (5 letters)","_____","word"));
+};
+const CARDS=[["5","He moves on to study law in a big city."],["4","A court sends him to prison for the rest of his life."],["9","He marries a nurse he got to know while studying."],["3","A baby is born in a village and gets a Xhosa name."],["2","The government starts a system that gives white people full power."],["8","He begins his studies at a university only for black students."],["1","After supporting a student protest, he has to leave university."]];
+R[2]=()=>{
+  let t=`<div class="paper"><h3>Put the events from Mandela's first 30 years (1918–1948) in the right order. One card happened much later and does not belong. Tap the cards in the right order to build the code.</h3>
+  <div class="cards">`;
+  CARDS.forEach((c,i)=>{const p=S.r2.indexOf(i);t+=`<button type="button" class="card ${p>-1?"used":""}" data-act="r2" data-i="${i}"><span class="n">${c[0]}</span><span>${c[1]}</span>${p>-1?`<span class="ord">#${p+1}</span>`:""}</button>`});
+  t+=`</div><div class="row" style="margin-top:12px"><button class="btn ghost" type="button" data-act="r2undo">Undo last card</button><button class="btn ghost" type="button" data-act="r2clear">Clear</button></div></div>`;
+  return shell(2,t+lockArea(2,"Code (6 digits)","______","num"));
+};
+R[3]=()=>{
+  const t=`<div class="paper"><h3>Follow the instructions. Only one path is correct.</h3><ol class="steps">
+  <li class="start"><div>Start with the number of people the police <b>killed</b> at Sharpeville.</div></li>
+  <li><div>If Mandela had always believed in <b>peaceful</b> protests, add 111.<br>If he had always believed in <b>violent</b> protests, add 99.</div></li>
+  <li><div>If the police <b>stopped</b> shooting when the people ran away, divide by 2.<br>If they <b>continued</b> shooting, multiply by 2.</div></li>
+  <li><div>If the military group's aim was to <b>kill people</b>, subtract 100.<br>If its aim was to <b>destroy government buildings</b>, add the year when Mandela was arrested for sabotage.</div></li>
+  <li><div>If Mandela was sent to Robben Island in the <b>same year</b> as his arrest, add 0.<br>If he was sent there <b>one year later</b>, add 1.</div></li>
+  </ol></div>`;
+  return shell(3,t+lockArea(3,"Code (4 digits)","____","num"));
+};
+const BOARD=[
+ ["Even before Mandela was sent to Robben Island, his first ","marry"," had ended in divorce."],
+ [" For the prisoners, life on the island meant years of great ","hard","."],
+ [" At first, ","communicate"," with the outside world was very limited – just two letters a year."],
+ [" In 1969 Mandela had to cope with the ","die"," of his oldest son, Madiba."],
+ [" The prison did not give him ","permit"," to go to the funeral."],
+ [" Still, he never gave up. In 1985 he made the brave ","decide"," to say no to the government's offer of freedom."]];
+R[4]=()=>{
+  let t=`<div class="paper"><h3>Complete each gap with a word from the same word family as the word in brackets. The number in [ ] tells you which letter of your word goes into the password.</h3>
+  <div class="board"><div class="board-h"><span>ROBBEN ISLAND MUSEUM</span><span>EXHIBIT E · PRISON YEARS</span></div><p>`;
+  BOARD.forEach((b,i)=>{const ok=S.r4ok.includes(i);t+=`${b[0]}<span class="gap"><input id="g${i}" class="${ok?"ok":""}" value="${esc(S.r4[i]||"")}" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Gap ${i+1}, word family of ${b[1]}" ${ok?"readonly":""}><span class="src">(${b[1]})</span><span class="pos">[${D.r4pos[i]}]</span></span>${b[2]}`});
+  t+=`</p></div><div class="row" style="margin-top:14px"><button class="btn ghost" type="button" data-act="r4check">Check my words</button></div><p class="fb" id="fb4w" role="status"></p></div>`;
+  return shell(4,t+lockArea(4,"Password (6 letters) – take the letters [ ] from your words","______","word"));
+};
+const DIAL=[["0","therefore"],["1","although"],["2","because"],["3","so that"],["4","because of"],["5","however"],["6","despite"],["7","as soon as"],["8","unless"],["9","in order to"]];
+R[5]=()=>{
+  let t=`<div class="paper stack"><h3>Find the linking word that fits each gap – in meaning and in grammar. The code is the five dial numbers in the order of the sentences.</h3><div class="dial">`;
+  DIAL.forEach(d=>t+=`<div><i>${d[0]}</i>${d[1]}</div>`);
+  t+=`</div><ol class="sent">
+  <li>1. <span class="blank"></span> Mandela had spent almost 27 years in prison, he was ready to work with the man whose government had locked him up.</li>
+  <li>2. Many white South Africans were nervous <span class="blank"></span> they were afraid of losing their land.</li>
+  <li>3. Mandela understood that hatred would never heal the country. <span class="blank"></span>, he agreed to work with de Klerk.</li>
+  <li>4. The two men worked together <span class="blank"></span> apartheid could end peacefully.</li>
+  <li>5. <span class="blank"></span> their hard work, both men won the Nobel Peace Prize in 1993.</li></ol>
+  <p style="margin:0">Careful: some words on the dial look right but don't work grammatically.</p></div>`;
+  return shell(5,t+lockArea(5,"Code (5 digits)","_____","num"));
+};
+const QS=[
+ ["„Mein Enkel sagt, Mandela hat sich nach seiner Zeit als Präsident zur Ruhe gesetzt. Stimmt das?“",
+  [["A","Ja, 1999 ging er in den Ruhestand und hat sich danach ganz aus der Öffentlichkeit zurückgezogen."],
+   ["B","Nicht ganz. 1999 hörte er zwar als Präsident auf, aber er setzte sich weiter für Frieden ein – in Afrika und auf der ganzen Welt."],
+   ["C","Ein Jahr später er zog sich zurück als der Präsident von Südafrika, aber Mandela zog sich nicht zurück von dem öffentlichen Leben."],
+   ["D","Nein, er blieb bis zu seinem Tod im Jahr 2013 Präsident von Südafrika."]]],
+ ["„Warum war es so mutig, dass Mandela über den Tod seines Sohnes gesprochen hat?“",
+  [["A","Weil sein Sohn Madiba 1969 bei einem Unfall starb und Mandela nicht zur Beerdigung durfte."],
+   ["B","Weil es sehr traurig für ihn war."],
+   ["C","Weil sein Sohn an Tuberkulose und Krebs starb – darüber hat man damals nicht gesprochen."],
+   ["D","Sein Sohn Makgatho starb 2005 an AIDS. Damals wurde in Afrika über diese Krankheit geschwiegen. Mandela machte es öffentlich, damit AIDS wie eine ganz normale Krankheit gesehen wird."]]],
+ ["„Und was meint sein Enkel mit dem Satz ganz am Ende der Tafel?“",
+  [["A","Er meint, dass wir alle Bürger dieser Welt sind und deshalb die Pflicht haben, sie gemeinsam besser zu machen."],
+   ["B","Er meint, dass alle Menschen auf der Welt die gleiche Staatsbürgerschaft bekommen sollten."],
+   ["C","Er meint, dass sein Großvater die Welt schon verbessert hat und die Arbeit jetzt erledigt ist."],
+   ["D","Wir sind alle Bürger von der Welt, und als Bürger es ist unsere Pflicht, zu helfen ändern sie für das Bessere."]]]];
+R[6]=()=>{
+  let t=`<div class="paper stack"><h3>The tourist asks three questions in German. For each one, choose the best German answer. A good answer is correct, gives the key information and sounds natural – no word-for-word translation.</h3>`;
+  QS.forEach((q,i)=>{t+=`<div class="q"><div class="ask">${i+1}. ${q[0]}</div><div class="opts">`;q[1].forEach(o=>{t+=`<button type="button" class="opt ${S.r6[i]===o[0]?"on":""}" data-act="r6" data-i="${i}" data-o="${o[0]}" lang="de" ${S.r6ok?"disabled":""}><b>${o[0]}</b><span>${o[1]}</span></button>`});t+=`</div></div>`});
+  t+=`</div>`;
+  if(!S.r6ok){t+=`<div class="lock"><div class="row"><button class="btn primary" type="button" data-act="r6check">Give her your answers</button></div><p class="fb" id="fb6" role="status"></p></div>`;}
+  else{
+    const cool=S.cool[7]&&S.cool[7]>Date.now();
+    t+=`<div class="door"><div class="in stack"><div><div class="eyebrow">Final door</div><h3>“Danke! I'll open the door – but the keypad needs the five digits you have collected.”</h3></div>
+    <div class="row"><input class="field code" id="code7" inputmode="numeric" autocomplete="off" placeholder="_____" ${cool?"disabled":""}><button class="btn primary" type="button" data-act="unlock" data-n="7" ${cool?"disabled":""}>Open the door</button></div><p class="fb" id="fb7" role="status"></p></div></div>`;
+  }
+  return shell(6,t);
+};
+
+/* ---------- SCREENS ---------- */
+function intro(){
+  const resume=S.start&&S.screen==="intro";
+  return `<section class="stack">
+  <div><div class="eyebrow">An escape game about Nelson Mandela · Text 2, pp. 23–25</div><h1>The Last Ferry</h1>
+  <p class="story">Robben Island, near Cape Town. Your class is on a tour of the prison where Nelson Mandela was kept for 18 years. You stayed behind in Cell Block B to take one more photo – and the heavy door has closed behind you.</p></div>
+  ${scene(`<p>Oh no – the door is locked, and the guards took the key home! I was a prisoner here myself, so I know every lock in this building.</p><p>Only people who know <b>the troublemaker's story</b> will find the way out: six locks, one door code. Your book is your map – pages 23 to 25.</p>`)}
+  <p class="story">The last ferry back to Cape Town leaves in <b>40 minutes</b>.</p>
+  <div class="rules">
+   <div><b>Team</b>Work in pairs. Read together, discuss, then decide.</div>
+   <div><b>Book</b>You need pages 23–25. Line numbers matter.</div>
+   <div><b>Wrong code</b>Costs 30 seconds. Three wrong codes in a row: the guard blocks the keypad for 20 seconds.</div>
+   <div><b>Hints</b>Hint 1 costs 1 minute, hint 2 costs 2 minutes.</div>
+  </div>
+  <div class="lock"><label for="team">Your team name</label>
+  <div class="row"><input class="field" id="team" maxlength="40" autocomplete="off" value="${esc(S.team)}" placeholder="e.g. Lena &amp; Jonas"><button class="btn primary" type="button" data-act="start">${resume?"Continue":"Start the clock"}</button></div>
+  <p class="fb" id="fb0" role="status"></p></div></section>`;
+}
+function fmt(s){s=Math.max(0,Math.round(s));return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
+function elapsed(){if(!S.start)return 0;return((S.end||Date.now())-S.start)/1000}
+function left(){return TOTAL+S.added-elapsed()-S.penalty}
+function endScreen(){
+  const used=elapsed()+S.penalty, l=left(), made=l>=0;
+  const hints=Object.values(S.hints).reduce((a,b)=>a+b,0);
+  const BQ=["Which line tells you how many letters Mandela could write <b>later</b> in prison?","In which line do you find out which language 'Rolihlahla' comes from?","In which line does the text mention the Nobel Peace Prize?"];
+  let b="";BQ.forEach((q,i)=>{const ok=S.bonusOk.includes(i);b+=`<div class="paper"><p>${q}</p><div class="row"><span>Line</span><input class="field" id="b${i}" inputmode="numeric" value="${esc(S.bonus[i]||"")}" ${ok?"readonly":""}><button class="btn ghost" type="button" data-act="bonus" data-i="${i}" ${ok?"disabled":""}>Check</button><span id="bf${i}" class="${ok?"ok-t":""}">${ok?"Correct!":""}</span></div></div>`});
+  return `<section class="stack">
+  <div><div class="eyebrow">${esc(S.team||"Your team")}</div><h1>${made?"You caught the last ferry!":"You're out – but the ferry has gone."}</h1>
+  </div>
+  ${harbour(made)}
+  <div class="stats"><div><span>Time used</span><b>${fmt(used)}</b></div><div><span>Time left</span><b>${made?fmt(l):"0:00"}</b></div><div><span>Hints</span><b>${hints}</b></div><div><span>Wrong codes</span><b>${S.wrong}</b></div></div>
+  <div class="paper stack"><div><div class="eyebrow">Exit ticket</div><h3>Mandela called his autobiography <i>Long Walk to Freedom</i>. Explain the title in two sentences. Use one fact from the text.</h3></div>
+  <textarea id="ticket" aria-label="Exit ticket">${esc(S.ticket)}</textarea></div>
+  <div class="bonus"><div><div class="eyebrow">Bonus vault – for fast teams</div><h3>Find the line. Use your book.</h3></div>${b}</div>
+  <p><b>Show this screen to your teacher.</b></p></section>`;
+}
+function render(){
+  const app=$("#app");app.classList.toggle("still",!top);
+  if(S.screen==="intro")app.innerHTML=intro();
+  else if(S.screen==="end")app.innerHTML=endScreen();
+  else if(S.screen==="map")app.innerHTML=mapView();
+  else app.innerHTML=R[S.screen]();
+  head(); window.scrollTo(0,0);
+}
+function head(){
+  let l="";for(let i=1;i<=6;i++){const done=S.solved.includes(i)||(i===6&&S.screen==="end");l+=done?ICON.lockO("var(--ok)"):ICON.lockC(S.screen===i?"var(--sea)":"var(--line)")}
+  $("#locks").innerHTML=l.replace(/var\(--(\w+)\)/g,(m,v)=>getComputedStyle(document.documentElement).getPropertyValue("--"+v).trim()||m);
+  $("#frag").innerHTML=DIGITS.map((d,i)=>S.solved.includes(i+1)?`<span class="got">${d}</span>`:`<span>?</span>`).join("");
+  tick();
+}
+function tick(){
+  const t=$("#timer");
+  if(!S.start){t.className="timer";t.innerHTML=ICON.ferry+"40:00";return}
+  const l=left();
+  if(l>=0){t.className="timer";t.innerHTML=ICON.ferry+fmt(l)}
+  else{t.className="timer late";t.innerHTML=ICON.ferry+"gone +"+fmt(-l)}
+  document.querySelectorAll("[data-n]").forEach(()=>{});
+  // release cooldowns
+  for(const k in S.cool){if(S.cool[k]&&S.cool[k]<=Date.now()){delete S.cool[k];save();if(S.screen!=="end"&&S.screen!=="intro"){const inp=$("#code"+k),btn=document.querySelector(`[data-act="unlock"][data-n="${k}"]`);if(inp){inp.disabled=false;btn.disabled=false;const f=$("#fb"+k);if(f){f.textContent="Keypad free again.";f.className="fb"}}}}}
+}
+setInterval(tick,1000);
+
+/* ---------- ACTIONS ---------- */
+function modal(html){$("#modal").innerHTML=html;$("#veil").hidden=false;const f=$("#modal").querySelector("input,button");if(f)f.focus()}
+function closeModal(){$("#veil").hidden=true}
+function wrongCode(n,msg){
+  S.wrong++;S.penalty+=30;S.streak[n]=(S.streak[n]||0)+1;document.body.classList.remove("flash");void document.body.offsetWidth;document.body.classList.add("flash");
+  const f=$("#fb"+n), inp=$("#code"+n);
+  if(S.streak[n]>=3){S.streak[n]=0;S.cool[n]=Date.now()+20000;if(inp)inp.disabled=true;const b=document.querySelector(`[data-act="unlock"][data-n="${n}"]`);if(b)b.disabled=true;msg="Three wrong codes – the guard blocks the keypad for 20 seconds. (−30 s)"}
+  if(f){f.textContent=msg||"Wrong code. The lock stays shut. (−30 s)";f.className="fb bad"}
+  const el=inp||f;if(el){el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake")}
+  save();tick();
+}
+function solve(n){
+  S.streak[n]=0;if(!S.solved.includes(n))S.solved.push(n);save();head();
+  modal(`<div class="eyebrow">Lock ${n} opened</div><h2>Click!</h2><div class="doorbox">${cellDoor(DIGITS[n-1])}</div><p>Behind the bars hangs a metal tag with the number <b>${DIGITS[n-1]}</b>. Keep it – it's part of the door code.</p><div class="row"><button class="btn primary" type="button" data-act="next">Back to the island map</button></div>`);confetti();
+}
+function finish(){
+  S.end=Date.now();S.screen="end";if(!S.solved.includes(6))S.solved.push(6);save();setTimeout(confetti,300);
+  modal(`<div class="eyebrow">The door opens</div><h2>4 6 6 6 4</h2><div class="doorbox">${gate()}</div><p>You have just typed Nelson Mandela's prison number from Robben Island (line 135). In 2003 he used this number as the name of a charity: international pop concerts raised money for people with AIDS. A number meant to take away his name became a symbol of hope.</p><div class="row"><button class="btn primary" type="button" data-act="close">Run to the harbour</button></div>`);
+  render();
+}
+function check(n){
+  const inp=$("#code"+n);const v=norm(inp&&inp.value);
+  if(!v){const f=$("#fb"+n);f.textContent="Type a code first.";f.className="fb bad";return}
+  const ans={1:D.r1,2:D.r2,3:D.r3,4:D.r4.map((w,k)=>w[0][D.r4pos[k]-1]).join(""),5:D.r5,7:D.door}[n];
+  if(v===ans){if(n===7)finish();else solve(n)}
+  else wrongCode(n, n===2&&v.length!==6?"The code has 6 digits. (−30 s)":null);
+}
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;
+  const a=b.dataset.act,n=+b.dataset.n,i=+b.dataset.i;
+  if(a==="start"){const t=$("#team").value.trim();if(!t){$("#fb0").textContent="Please enter a team name.";$("#fb0").className="fb bad";return}S.team=t;if(!S.start)S.start=Date.now();S.screen="map";save();render()}
+  else if(a==="unlock")check(n);
+  else if(a==="next"){closeModal();MOVE={to:S.screen+1};S.screen="map";save();render()}
+  else if(a==="map"){S.screen="map";save();render()}
+  else if(a==="room"){S.screen=n;save();render()}
+  else if(a==="close"){closeModal()}
+  else if(a==="hint"){const h=S.hints[n]||0;S.hints[n]=h+1;S.penalty+=h===0?60:120;save();render()}
+  else if(a==="r1"){S.r1[i]=+b.dataset.k;save();b.closest("tr").querySelectorAll(".cell").forEach(c=>c.classList.toggle("on",c===b))}
+  else if(a==="r2"){if(S.r2.includes(i)){S.r2=S.r2.filter(x=>x!==i)}else if(S.r2.length<6){S.r2.push(i)}save();const v=S.r2.map(x=>CARDS[x][0]).join("");render();$("#code2").value=v}
+  else if(a==="r2undo"){S.r2.pop();save();const v=S.r2.map(x=>CARDS[x][0]).join("");render();$("#code2").value=v}
+  else if(a==="r2clear"){S.r2=[];save();render()}
+  else if(a==="r4check"){
+    let bad=0;BOARD.forEach((x,k)=>{const el=$("#g"+k);S.r4[k]=el.value;if(S.r4ok.includes(k))return;if(D.r4[k].includes(norm(el.value))){S.r4ok.push(k)}else bad++});
+    if(bad){S.wrong++;S.penalty+=30}
+    save();render();
+    const f=$("#fb4w");
+    if(!bad){f.textContent="All six words are correct. Now find the password!";f.className="fb good"}
+    else{BOARD.forEach((x,k)=>{if(!S.r4ok.includes(k))$("#g"+k).classList.add("no")});f.textContent=`${bad} word${bad>1?"s are":" is"} still wrong. (−30 s)`;f.className="fb bad"}
+  }
+  else if(a==="r6"){S.r6[i]=b.dataset.o;save();b.parentElement.querySelectorAll(".opt").forEach(o=>o.classList.toggle("on",o===b))}
+  else if(a==="r6check"){
+    const f=$("#fb6");
+    if(Object.keys(S.r6).length<3){f.textContent="Answer all three questions first.";f.className="fb bad";return}
+    const right=D.r6.filter((x,k)=>S.r6[k]===x).length;
+    if(right===3){S.r6ok=true;save();render();const c=$("#code7");if(c)c.scrollIntoView({behavior:"smooth",block:"center"})}
+    else{S.wrong++;S.penalty+=30;save();tick();f.textContent=`She frowns. ${right} of 3 answers are good – but she won't tell you which. (−30 s)`;f.className="fb bad"}
+  }
+  else if(a==="bonus"){const el=$("#b"+i);S.bonus[i]=el.value;const ok=D.bonus[i].includes(norm(el.value));const f=$("#bf"+i);if(ok){S.bonusOk.push(i);el.readOnly=true;b.disabled=true;f.textContent="Correct!";f.className="ok-t"}else{f.textContent="Not this line.";f.className=""}save()}
+  else if(a==="teacher")teacherOpen();
+  else if(a==="tlogin"){if(norm($("#tcode").value)===D.teacher){teacher=true;teacherOpen()}else{$("#tfb").textContent="Wrong teacher code.";$("#tfb").className="fb bad"}}
+  else if(a==="tskip"){closeModal();const r=S.screen;if(typeof r==="number"){if(r===6){if(!S.start)S.start=Date.now();finish()}else{if(!S.solved.includes(r))S.solved.push(r);MOVE={to:r+1};S.screen="map";save();render()}}}
+  else if(a==="tgo"){closeModal();if(!S.start)S.start=Date.now();S.end=0;S.screen=n;S.solved=[];for(let k=1;k<n;k++)S.solved.push(k);save();render()}
+  else if(a==="tadd"){S.added+=300;save();tick();teacherOpen()}
+  else if(a==="treset"){$("#tconfirm").hidden=false}
+  else if(a==="treset2"){S=fresh();save();closeModal();render()}
+});
+document.addEventListener("input",e=>{
+  if(e.target.id==="ticket"){S.ticket=e.target.value;save()}
+  else if(/^g\d$/.test(e.target.id)){S.r4[+e.target.id.slice(1)]=e.target.value;e.target.classList.remove("no");save()}
+});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&!$("#veil").hidden){closeModal();return}
+  if(e.key!=="Enter"&&e.key!==" ")return;if(e.target.classList&&e.target.classList.contains("node")){e.preventDefault();e.target.dispatchEvent(new MouseEvent("click",{bubbles:true}));return}if(e.key!=="Enter")return;const id=e.target.id||"";
+  if(/^code\d$/.test(id))check(+id.slice(4));
+  else if(id==="team")$('[data-act="start"]').click();
+  else if(id==="tcode")$('[data-act="tlogin"]').click();
+});
+$("#veil").addEventListener("click",e=>{if(e.target.id==="veil"&&teacher)closeModal()});
+
+function teacherOpen(){
+  if(!teacher){modal(`<div class="eyebrow">Teacher mode</div><h2>Teacher code</h2><div class="row"><input class="field" id="tcode" autocomplete="off" autocapitalize="characters"><button class="btn primary" type="button" data-act="tlogin">Enter</button></div><p class="fb" id="tfb"></p><div class="row"><button class="btn ghost" type="button" data-act="close">Back to the game</button></div>`);return}
+  const r=S.screen;const sol=typeof r==="number"?D.sol[r]:"";
+  let go="";for(let k=1;k<=6;k++)go+=`<button class="btn ghost" type="button" data-act="tgo" data-n="${k}">Lock ${k}</button>`;
+  modal(`<div class="eyebrow">Teacher mode</div><h2>Control panel</h2>
+  ${sol?`<h3>Solution – lock ${r}</h3><div class="sol">${esc(sol)}</div>`:"<p>Open a lock to see its solution here.</p>"}
+  <div class="row" style="margin:12px 0">${typeof r==="number"?`<button class="btn primary" type="button" data-act="tskip">Skip this lock</button>`:""}<button class="btn" type="button" data-act="tadd">+5 minutes</button></div>
+  <h3>Jump to a lock</h3><div class="tgrid">${go}</div>
+  <div class="row" style="margin-top:14px"><button class="btn ghost" type="button" data-act="treset">Reset game</button><button class="btn ghost" type="button" data-act="close">Close</button></div>
+  <div id="tconfirm" hidden><p class="fb bad">This deletes all progress on this device.</p><button class="btn" type="button" data-act="treset2">Yes, reset</button></div>`);
+}
+render();
+</script>
+
+</body>
+</html>
