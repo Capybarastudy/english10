@@ -122,6 +122,13 @@ details.rules ul{margin:8px 0 2px;padding-left:20px}
 .ord .chip.sel{outline:4px solid var(--sun);outline-offset:1px;background:var(--key-soft)}
 .ord .chip{cursor:pointer}
 @media(max-width:560px){.bar{display:none}.board{flex-direction:column;align-items:flex-start}}
+.garden{display:block;width:100%;height:auto;border-radius:18px;box-shadow:0 8px 24px rgba(11,61,46,.18);font-family:var(--f-body)}
+.spot{cursor:pointer;outline:none}
+.spot .art{transition:transform .2s;transform-box:fill-box;transform-origin:50% 100%}
+.spot:hover .art,.spot:focus-visible .art{transform:scale(1.07)}
+.spot:focus-visible .pill{stroke:#0B3D2E;stroke-width:5}
+.spot:hover .pill{fill:#FFF3C4}
+.cap{min-height:3em;margin:10px 2px 0;font-size:15px;color:var(--muted)}
 /* scene motion */
 .sway{transform-box:fill-box;transform-origin:50% 100%;animation:sway 4s ease-in-out infinite alternate}
 .sway.s2{animation-duration:5.2s;animation-delay:-1.5s}
@@ -236,6 +243,62 @@ ${tree(60,300,1,"#2E9E5B","#4DB868","")}${tree(235,296,.8,"#3BAE63","#6CCB5F","s
 </svg>`}
 function miniScene(){return `<svg class="scene mini" viewBox="0 0 900 110" aria-hidden="true"><defs><linearGradient id="sk2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ADFCB"/><stop offset="1" stop-color="#EAF8D8"/></linearGradient></defs><rect width="900" height="110" fill="url(#sk2)"/>${cloud(120,26,.6,30,0)}${cloud(560,20,.5,34,-9)}${turbine(70,86,.55,6)}${turbine(130,90,.4,8)}${turbine(820,86,.5,7)}<path d="M0 90 Q220 76 450 88 T900 84 L900 110 L0 110Z" fill="#5DBB63"/>${tree(250,98,.5,"#2E9E5B","#4DB868","")}${bush(330,102,.7,"#3BAE63")}${panel(560,100,.6)}${panel(590,102,.6)}${tree(700,100,.5,"#3BAE63","#6CCB5F","s2")}${drone(18,40,0)}</svg>`}
 
+/* ---------- garden map ---------- */
+const LBL={read:"Read & check",proscons:"Pros & cons",words:"Key words",structure:"Structure",future:"The future",talk:"Talk",final:"Final task",cert:"Certificate"};
+const SPOT={read:[170,840],proscons:[450,825],words:[730,840],structure:[740,630],future:[450,615],talk:[160,630],final:[270,410],cert:[630,290]};
+function catmull(pts){let d=`M${pts[0][0]} ${pts[0][1]}`;for(let i=0;i<pts.length-1;i++){const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;d+=` C${(p1[0]+(p2[0]-p0[0])/6).toFixed(1)} ${(p1[1]+(p2[1]-p0[1])/6).toFixed(1)} ${(p2[0]-(p3[0]-p1[0])/6).toFixed(1)} ${(p2[1]-(p3[1]-p1[1])/6).toFixed(1)} ${p2[0]} ${p2[1]}`}return d}
+const rnd=i=>Math.abs((Math.sin(i*127.1+311.7)*43758.5453)%1);
+function flower(x,y,c,k){return `<g transform="translate(${x},${y}) scale(${k||1})"><path d="M0 0V-12" stroke="#2E9E5B" stroke-width="2.5"/><g class="sway s2"><circle cx="0" cy="-15" r="5.5" fill="${c}"/><circle cx="0" cy="-15" r="2.4" fill="#FFD84D"/></g></g>`}
+function spotArt(id,done){
+  const A={
+  read:`<rect x="-4" y="-34" width="8" height="40" fill="#8A6A45"/><g transform="rotate(-4)"><rect x="-44" y="-86" width="88" height="58" rx="6" fill="#fff" stroke="#2E9E5B" stroke-width="3"/><rect x="-34" y="-77" width="30" height="20" rx="2" fill="#BFE5CC"/><path d="M0 -74h30M0 -66h30M0 -58h30M-34 -48h68M-34 -40h50" stroke="#9AB8AE" stroke-width="3" stroke-linecap="round"/></g>`,
+  proscons:`<path d="M-16 8L0 -30L16 8Z" fill="#8A6A45"/><g><animateTransform attributeName="transform" type="rotate" values="-7 0 -30;7 0 -30;-7 0 -30" dur="4s" repeatCount="indefinite"/><rect x="-64" y="-34" width="128" height="8" rx="4" fill="#B88B5A"/><circle cx="-52" cy="-52" r="17" fill="#2E9E5B"/><path d="M-60 -52h16M-52 -60v16" stroke="#fff" stroke-width="4" stroke-linecap="round"/><circle cx="52" cy="-52" r="17" fill="#F0745A"/><path d="M44 -52h16" stroke="#fff" stroke-width="4" stroke-linecap="round"/></g>`,
+  words:`<rect x="-4" y="-96" width="8" height="104" rx="3" fill="#8A6A45"/><path d="M-50 -88h66l12 11-12 11h-66z" fill="#A8E05F"/><path d="M50 -62h-66l-12 11 12 11h66z" fill="#FFD84D"/><path d="M-46 -36h58l12 11-12 11h-58z" fill="#7CCFE0"/><path d="M-40 -77h40M-18 -51h50M-34 -25h38" stroke="#12362A" stroke-width="3" stroke-linecap="round" opacity=".55"/>`,
+  structure:`<path d="M-44 8V-92M44 8V-92" stroke="#8A6A45" stroke-width="7" stroke-linecap="round"/><path d="M-44 -72H44M-44 -44H44M-44 -16H44" stroke="#B88B5A" stroke-width="5"/><path d="M-30 8Q-48 -20 -22 -38T-26 -78 6 -90" fill="none" stroke="#2E9E5B" stroke-width="5" stroke-linecap="round"/><g class="sway"><ellipse cx="-34" cy="-30" rx="9" ry="5" fill="#4DB868"/><ellipse cx="-14" cy="-52" rx="9" ry="5" fill="#6CCB5F"/><ellipse cx="-30" cy="-70" rx="9" ry="5" fill="#4DB868"/><ellipse cx="14" cy="-84" rx="9" ry="5" fill="#6CCB5F"/><ellipse cx="34" cy="-60" rx="9" ry="5" fill="#4DB868"/></g>`,
+  future:`<rect x="-5" y="-20" width="10" height="28" fill="#8A6A45"/><circle cx="0" cy="-58" r="40" fill="#fff" stroke="#1F5F8B" stroke-width="5"/><path d="M0 -92v6M0 -30v6M-34 -58h6M28 -58h6" stroke="#1F5F8B" stroke-width="3" stroke-linecap="round"/><path d="M0 -58V-84" stroke="#12362A" stroke-width="4" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 0 -58" to="360 0 -58" dur="12s" repeatCount="indefinite"/></path><path d="M0 -58H18" stroke="#2E9E5B" stroke-width="5" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 0 -58" to="360 0 -58" dur="60s" repeatCount="indefinite"/></path><circle cx="0" cy="-58" r="4" fill="#F0745A"/>`,
+  talk:`<rect x="-52" y="-18" width="104" height="10" rx="3" fill="#B88B5A"/><rect x="-52" y="-44" width="104" height="9" rx="3" fill="#B88B5A"/><path d="M-44 -8v18M44 -8v18" stroke="#8A6A45" stroke-width="6"/><g class="sway"><rect x="-62" y="-100" width="54" height="34" rx="14" fill="#fff" stroke="#2E9E5B" stroke-width="3"/><path d="M-30 -67l-8 12 16-12" fill="#fff" stroke="#2E9E5B" stroke-width="3"/><circle cx="-47" cy="-83" r="3.2" fill="#2E9E5B"/><circle cx="-35" cy="-83" r="3.2" fill="#2E9E5B"/><circle cx="-23" cy="-83" r="3.2" fill="#2E9E5B"/></g><g class="sway s2"><rect x="8" y="-90" width="54" height="34" rx="14" fill="#FFF3C4" stroke="#E8A400" stroke-width="3"/><path d="M36 -57l8 12-16-12" fill="#FFF3C4" stroke="#E8A400" stroke-width="3"/><circle cx="23" cy="-73" r="3.2" fill="#E8A400"/><circle cx="35" cy="-73" r="3.2" fill="#E8A400"/><circle cx="47" cy="-73" r="3.2" fill="#E8A400"/></g>`,
+  final:`<g class="sway"><rect x="-8" y="-60" width="16" height="68" rx="6" fill="#7A5A3A"/><ellipse cx="0" cy="-94" rx="56" ry="44" fill="#2E9E5B"/><ellipse cx="-34" cy="-74" rx="30" ry="26" fill="#4DB868"/><ellipse cx="34" cy="-76" rx="28" ry="24" fill="#6CCB5F"/>${done?[[-30,-96],[10,-110],[34,-84],[-4,-76],[-46,-72]].map(q=>`<circle cx="${q[0]}" cy="${q[1]}" r="7" fill="#FFD84D" stroke="#E8A400" stroke-width="2"/>`).join(""):`<circle cx="-30" cy="-96" r="5" fill="#9ED88C"/><circle cx="26" cy="-100" r="5" fill="#9ED88C"/>`}</g>`,
+  cert:`<rect x="-72" y="-14" width="144" height="22" rx="4" fill="#8A6A45"/><path d="M-66 -14A66 76 0 0 1 66 -14Z" fill="#CFEFF7" fill-opacity=".8" stroke="#1F5F8B" stroke-width="4"/><path d="M0 -90V-14M-33 -80V-14M33 -80V-14M-62 -40H62M-48 -66H48" stroke="#1F5F8B" stroke-width="2.5" opacity=".55"/><ellipse cx="-30" cy="-22" rx="14" ry="8" fill="#4DB868"/><ellipse cx="32" cy="-24" rx="14" ry="9" fill="#2E9E5B"/><path d="M0 -66l7 15 16 2-12 11 3 16-14-8-14 8 3-16-12-11 16-2z" fill="#FFD84D" stroke="#E8A400" stroke-width="2"/>`};
+  return A[id]}
+function gardenSpot(id,i,next){
+  const [x,y]=SPOT[id],st=stations.find(s=>s.id===id),done=!!S.done[id]&&!st.cert,p=S.pts[id];
+  const sub=done?`${p&&p.stars?starStr(p.stars)+"  ":""}${ptsOf(p)} pts`:"";
+  const lab=(done?"✓ ":st.cert?"★ ":(i+1)+" · ")+LBL[id],w=lab.length*15.5+44,h=sub?64:42;
+  const cap=`${st.t} – ${st.s} (${st.m})`;
+  const fl=done?[[-62,10,"#F0745A"],[-38,18,"#FFD84D"],[40,18,"#F58CC0"],[64,8,"#8EDB6B"],[0,24,"#fff"]].map(f=>flower(f[0],f[1],f[2],1.15)).join(""):"";
+  return `<g class="spot ${done?"done":""} ${next?"next":""}" data-go="${id}" role="button" tabindex="0" aria-label="${esc(cap)}${done?" – done":""}" data-cap="${esc(cap)}" transform="translate(${x},${y})">
+<rect x="-95" y="-125" width="190" height="240" fill="#fff" fill-opacity="0"/>
+${next?`<ellipse cx="0" cy="14" rx="88" ry="32" fill="none" stroke="#FFD84D" stroke-width="5" stroke-dasharray="10 8"><animate attributeName="stroke-dashoffset" from="0" to="36" dur="1.2s" repeatCount="indefinite"/></ellipse>`:""}
+<g class="art"><ellipse cx="0" cy="14" rx="72" ry="24" fill="#7A5A3A"/><ellipse cx="0" cy="9" rx="66" ry="19" fill="${done?"#4DAE5A":"#6C9A54"}"/>${spotArt(id,done)}${fl}</g>
+<g transform="translate(0,52)"><rect class="pill" x="${-w/2}" y="0" width="${w}" height="${h}" rx="${h/2}" fill="${done?"#D4F0E0":"#fff"}" stroke="${done?"#24965E":"#2E9E5B"}" stroke-width="3"/><text x="0" y="29" text-anchor="middle" font-size="26" font-weight="700" fill="#12362A">${esc(lab)}</text>${sub?`<text x="0" y="52" text-anchor="middle" font-size="21" font-weight="700" fill="#B07A00">${esc(sub)}</text>`:""}</g></g>`}
+function garden(){
+  const ids=stations.map(s=>s.id),nextId=ids.find(i=>i!=="cert"&&!S.done[i])||"cert";
+  const path=catmull([SPOT.read,SPOT.proscons,SPOT.words,[842,740],SPOT.structure,SPOT.future,SPOT.talk,[70,520],SPOT.final,[470,350],SPOT.cert].map(q=>q.slice()));
+  let fl="";for(let i=0;i<70;i++){const x=20+rnd(i)*860,y=250+rnd(i+99)*700;fl+=flower(x.toFixed(0),y.toFixed(0),["#F0745A","#FFD84D","#F58CC0","#fff","#B9A6F2"][i%5],.75+rnd(i+7)*.5)}
+  return `<svg class="garden" viewBox="0 0 900 980" role="group" aria-label="Garden map with the stations of this learning path">
+<defs><linearGradient id="gsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FD9C6"/><stop offset="1" stop-color="#EAF8D8"/></linearGradient><linearGradient id="ggr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8ED48F"/><stop offset="1" stop-color="#4DAE5A"/></linearGradient></defs>
+<rect width="900" height="980" fill="url(#gsk)"/>
+<circle cx="800" cy="70" r="44" fill="#FFD84D" class="sun"/>
+${cloud(80,60,.9,40,0)}${cloud(470,40,.7,46,-14)}
+${turbine(90,232,1.1,7)}${turbine(180,236,.8,9.5)}${turbine(840,230,.95,8)}
+${tower(250,48,100,236)}${tower(304,40,130,236)}${tower(350,56,86,236)}${tower(412,44,112,236)}
+<path d="M0 222Q220 196 450 216T900 206L900 980L0 980Z" fill="url(#ggr)"/>
+<ellipse cx="450" cy="700" rx="470" ry="110" fill="#9BE08F" opacity=".35"/>
+${fl}
+<g><ellipse cx="820" cy="450" rx="82" ry="38" fill="#5BBBD6"/><ellipse cx="820" cy="446" rx="72" ry="31" fill="#8FDDF0"/><ellipse cx="800" cy="450" rx="14" ry="6" fill="#4DB868"/><ellipse cx="842" cy="441" rx="12" ry="5" fill="#2E9E5B"/><ellipse cx="820" cy="446" rx="20" ry="8" fill="none" stroke="#fff" stroke-width="2"><animate attributeName="rx" values="10;60;10" dur="5s" repeatCount="indefinite"/><animate attributeName="ry" values="4;24;4" dur="5s" repeatCount="indefinite"/><animate attributeName="opacity" values=".9;0;.9" dur="5s" repeatCount="indefinite"/></ellipse></g>
+<path d="${path}" fill="none" stroke="#C9A872" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="${path}" fill="none" stroke="#E8D3A8" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="${path}" fill="none" stroke="#C9A872" stroke-width="3" stroke-dasharray="2 18" stroke-linecap="round"/>
+${panel(60,340,1.1)}${panel(112,344,1.1)}${panel(164,340,1.1)}
+${tree(40,950,1.2,"#2E9E5B","#4DB868","")}${tree(870,950,1.2,"#3BAE63","#6CCB5F","s2")}${tree(870,330,1,"#2E9E5B","#4DB868","")}${tree(36,500,.9,"#3BAE63","#6CCB5F","s2")}
+${bush(310,940,1.1,"#2E9E5B")}${bush(590,945,1,"#3BAE63")}${bush(60,760,1,"#2E9E5B")}${bush(870,600,1,"#3BAE63")}${bush(450,440,1,"#2E9E5B")}${bush(860,880,.9,"#2E9E5B")}
+${ids.map((id,i)=>gardenSpot(id,i,id===nextId)).join("")}
+${drone(22,120,0)}
+<g><animateMotion path="M0 0 c 40 -30 90 20 130 -5 s -70 -40 -130 5" dur="7s" repeatCount="indefinite"/><g transform="translate(330,520)"><ellipse rx="6" ry="4.5" fill="#FFD84D"/><path d="M-6 0h12" stroke="#12362A" stroke-width="2"/><ellipse cx="-3" cy="-5" rx="4" ry="2.5" fill="#fff" opacity=".8"><animate attributeName="ry" values="2.5;.6;2.5" dur=".15s" repeatCount="indefinite"/></ellipse></g></g>
+<g><animateMotion path="M0 0 c -30 -40 -90 -10 -120 -40 s 80 -30 120 40" dur="9s" repeatCount="indefinite"/><g transform="translate(600,690)"><ellipse rx="6" ry="4.5" fill="#FFD84D"/><path d="M-6 0h12" stroke="#12362A" stroke-width="2"/><ellipse cx="-3" cy="-5" rx="4" ry="2.5" fill="#fff" opacity=".8"><animate attributeName="ry" values="2.5;.6;2.5" dur=".15s" repeatCount="indefinite"/></ellipse></g></g>
+<g><animateMotion path="M0 0 c 50 -50 110 10 160 -30 s -90 -60 -160 30" dur="11s" repeatCount="indefinite"/><g transform="translate(430,460)"><g><animateTransform attributeName="transform" type="scale" values="1 1;.25 1;1 1" dur=".5s" repeatCount="indefinite"/><ellipse cx="-7" cy="-2" rx="7" ry="9" fill="#F58CC0"/><ellipse cx="7" cy="-2" rx="7" ry="9" fill="#B9A6F2"/></g><rect x="-1" y="-8" width="2" height="14" fill="#12362A"/></g></g>
+</svg>`}
+
 /* ---------- stations ---------- */
 const stations=[
 {id:"read",t:"Read & check",s:"Newspaper article, p. 36 · true, false or not in the text",m:"≈ 10 min · reading"},
@@ -282,11 +345,11 @@ function progress(){const n=doneCount();$("#sp").textContent=totalPts()+" pts";$
 
 function home(){
   history.replaceState(null,"",location.pathname+location.search);curSt=null;
-  $("#app").innerHTML=`${scene()}<div class="eyebrow">Unit 2 · Topic 1 · Student book pp. 36–38</div><h1>The Green Way</h1>
-  <p class="lead">Can plants on a motorway really clean the air of a big city? Work through six stations, write your own text and create your certificate.</p>
+  $("#app").innerHTML=`<div class="eyebrow">Unit 2 · Topic 1 · Student book pp. 36–38</div><h1>The Green Way</h1>
+  <p class="lead">Can plants on a motorway really clean the air of a big city? Walk through the garden, visit the six stations, write your own text and collect your certificate in the greenhouse.</p>
   <div class="goal">By the end you can describe the pros and cons of a technological development.</div>
   <div class="how"><div><b>Order</b>Do the stations in the order you like. Do the final task last.</div><div><b>Score</b>Fewer checks and a faster time give more points. Who becomes the Green Legend?</div><div><b>Material</b>Keep your student book open at pp. 36–38.</div></div>
-  ${board()}<ol class="route">${stations.map((s,i)=>`<li class="stop ${S.done[s.id]?"done":""} ${s.final||s.cert?"final":""}"><span class="num">${s.cert?"★":S.done[s.id]?plant(4):i+1}</span><button class="card" type="button" data-go="${s.id}"><span class="t">${esc(s.t)}</span><span class="s">${esc(s.s)}</span><span class="m">${S.done[s.id]&&!s.cert?doneLabel(s.id):esc(s.m)}</span></button></li>`).join("")}</ol>
+  ${board()}<h2 style="font-size:24px;margin-top:6px">The garden map</h2><p style="margin-bottom:8px">Tap a spot to start. The glowing circle shows a good next step. You can visit the stations in any order.</p>${garden()}<p class="cap" id="cap" aria-live="polite">Tap a spot in the garden.</p>
   <div class="row"><button class="btn ghost" type="button" data-act="reset">Start again</button></div>`;
   progress();window.scrollTo(0,0);
 }
@@ -323,8 +386,9 @@ R.proscons=()=>`<p>Tap an argument, then tap the box where it belongs. Tap a sor
 <textarea data-text="s2opinion" placeholder="I think / I don't think … because …">${esc(V("s2opinion",""))}</textarea>${chk("proscons")}`;
 /* 3 words */
 R.words=()=>`<p>Choose the right word or phrase for each gap. Every word is used once.</p>`+wordsHtml()+chk("words");
+const WPARTS=["A town wants to build a solar roof over its school. Supporters say it is very ","(1)"," because it produces clean energy. They ","(2)"," that it will cut the electricity bills by half. However, the building costs are ","(3)",". Some parents ask how the council can ","(4)"," spending so much money. They are not ","(5)"," the plan. ","(6)",", the roof might make the classrooms darker. The ","(7)"," question is: who will pay? Diesel buses are ","(8)"," to our health, but a solar roof will not solve that problem."];
 function wordsHtml(){
-  const parts=["A town wants to build a solar roof over its school. Supporters say it is very ","(1)"," because it produces clean energy. They ","(2)"," that it will cut the electricity bills by half. However, the building costs are ","(3)",". Some parents ask how the council can ","(4)"," spending so much money. They are not ","(5)"," the plan. ","(6)",", the roof might make the classrooms darker. The ","(7)"," question is: who will pay? Diesel buses are ","(8)"," to our health, but a solar roof will not solve that problem."];
+  const parts=WPARTS;
   let g=0;
   const html=parts.map(p=>{if(/^\(\d\)$/.test(p)){const i=g++;return `<select data-k="w${i}" aria-label="gap ${i+1}"><option value="">${i+1} …</option>${WORDS.map(w=>`<option ${V("w"+i)===w?"selected":""}>${w}</option>`).join("")}</select>`}return esc(p)}).join("");
   return `<div class="tip"><b>Word bank</b><span>${WORDS.map(esc).join(" · ")}</span></div><div class="paper dlg"><p>${html}</p></div>`;
@@ -377,13 +441,14 @@ function scoreCode(){
 function record(){
   const sec=[],tag=id=>S.done[id]?"":" (not solved yet)";
   const lst=(p,items,b)=>items.filter((x,i)=>p[i]===b).map(x=>x[0]).join(" / ")||"–";
-  sec.push(["1 · Read & check"+tag("read"),READ.map((r,i)=>(i+1)+" "+(ANSL[V("read"+i)]||"–")).join("  ·  ")]);
+  const ev=r=>/^Lines/.test(r[2])?" ["+r[2].split(":")[0].replace(/\.$/,"")+"]":"";
+  sec.push(["1 · Read & check"+tag("read")].concat(READ.map((r,i)=>{const a=V("read"+i);return (i+1)+". "+r[0]+"  →  "+(ANSL[a]||"no answer")+(a===r[1]?ev(r):"")})));
   const p2=V("s2",{});
   sec.push(["2 · Pros & cons"+tag("proscons"),"Pros: "+lst(p2,SORT2,"pro"),"Cons: "+lst(p2,SORT2,"con"),"Most important point: "+({a:"The plants make the motorway look nicer.",b:"The scheme has not reduced the number of cars, so pollution is still a problem.",c:"The plants need too much water."}[V("s2q")]||"–"),"My opinion: "+(V("s2opinion","").trim()||"–")]);
-  sec.push(["3 · Key words"+tag("words"),WANS.map((_,i)=>(i+1)+" "+(V("w"+i)||"–")).join("  ·  ")]);
+  let g=0;sec.push(["3 · Key words"+tag("words"),WPARTS.map(q=>/^\(\d\)$/.test(q)?"["+(V("w"+(g++))||"…")+"]":q).join("")]);
   const p4=V("s4",{});
-  sec.push(["4 · Structure"+tag("structure"),"Pros: "+lst(p4,SORT4,"pro"),"Cons: "+lst(p4,SORT4,"con"),"Structure: "+lst(p4,SORT4,"str"),"My order of the model paragraph (sentence numbers): "+ordArr().map(n=>n+1).join(" – ")]);
-  sec.push(["5 · Talking about the future"+tag("future"),"A: "+FA.map((f,i)=>(i+1)+" "+(V("fa"+i)===undefined||V("fa"+i)===""?"–":f[1][+V("fa"+i)])).join("  ·  "),"B: "+DLG.map((d,i)=>d[1]?"("+d[1].match(/\d+/)[0]+") "+(V("d"+i,"").trim()||"–"):null).filter(Boolean).join("  ·  ")]);
+  sec.push(["4 · Structure"+tag("structure"),"Pros: "+lst(p4,SORT4,"pro"),"Cons: "+lst(p4,SORT4,"con"),"Structure: "+lst(p4,SORT4,"str"),"My order of the model paragraph:"].concat(ordArr().map((n,i)=>(i+1)+". "+ORDER[n])));
+  sec.push(["5 · Talking about the future"+tag("future"),"A"].concat(FA.map((f,i)=>{const a=V("fa"+i);const w=a===undefined||a===""?"…":f[1][+a];return (i+1)+". "+f[0].replace("___","["+w+"]")}),["B"],DLG.map((d,i)=>d[1]===null?d[0]:d[0]+"["+(V("d"+i,"").trim()||"…")+"]"+d[3])));
   sec.push(["6 · Talk about it"+tag("talk"),"Self-check boxes ticked: "+[0,1,2].filter(i=>V("tk"+i)).length+" of 3"]);
   return sec;
 }
@@ -486,7 +551,7 @@ const MSG={read:["Perfect – all eight correct!","Not quite yet. Look at the re
 
 /* ---------- events ---------- */
 document.addEventListener("click",e=>{
-  const t=e.target.closest("button,[data-bucket]");if(!t)return;
+  const t=e.target.closest("button,[data-bucket],[data-go]");if(!t)return;
   if(t.dataset.go)return open(t.dataset.go);
   const a=t.dataset.act;
   if(a==="home")return home();
@@ -507,7 +572,9 @@ document.addEventListener("click",e=>{
   if(b){const[k,bk]=b.split(":");const s=V(k+"sel",null);if(s===null)return;const p=V(k,{});p[s]=bk;setV(k,p);setV(k+"sel",null);redraw(k)}
 });
 function redraw(k){if(k==="s2")rerender("sort2",()=>sortRender("s2",SORT2,[["pro","Pros 👍"],["con","Cons 👎"]]));else rerender("sort4",()=>sortRender("s4",SORT4,[["pro","Pros"],["con","Cons"],["str","Structure"]]))}
-document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.dataset&&e.target.dataset.bucket){e.preventDefault();e.target.click()}});
+function capShow(e){const g=e.target.closest&&e.target.closest(".spot"),c=$("#cap");if(g&&c)c.textContent=g.dataset.cap}
+document.addEventListener("pointerover",capShow);document.addEventListener("focusin",capShow);
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.dataset&&(e.target.dataset.bucket||e.target.dataset.go)){e.preventDefault();e.target.click()}});
 document.addEventListener("change",e=>{const t=e.target;if(t.matches("select[data-k]")){setV(t.dataset.k,t.value)}else if(t.matches("input[type=checkbox][data-k]")){setV(t.dataset.k,t.checked)}});
 document.addEventListener("input",e=>{const t=e.target;if(t.matches("input.gap")||t.matches("input[type=text][data-k]")){setV(t.dataset.k,t.value)}else if(t.dataset.text){setV(t.dataset.text,t.value);wc()}});
 function wc(){const x=$("#wc");if(x){const n=(V("ftext","").trim().match(/\S+/g)||[]).length;x.textContent=n+" words"}}
