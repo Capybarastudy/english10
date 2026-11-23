@@ -162,17 +162,17 @@ const FA=[
 ["Look at those black clouds! It ___ any minute.",["will rain","is going to rain","rains"],1,"There are signs now (the clouds), so we use going to."],
 ["I hope the plants ___ well this summer.",["will grow","are growing","grows"],0,"After I hope / I think / I’m sure we use will."],
 ["– I’ve got no pen. – Don’t worry, I ___ you one.",["am lending","will lend","lend"],1,"A spontaneous decision needs will."],
-["We ___ our new school garden on Saturday. The tools are ready.",["will start","start","are starting"],2,"A fixed arrangement with preparations made: present progressive (going to is also fine)."],
+["We ___ our new school garden on Saturday. The tools are ready.",["will start","start","are starting"],[2,0],"A fixed arrangement with preparations made: present progressive. (Will start is accepted here, too.)"],
 ["If it ___ tomorrow, we will stay at home.",["will rain","rains","is raining"],1,"In an if-clause (type 1) we use the simple present, not will."]];
 const DLG=[
 ["Mia: Have you decided what to do on Eco Day?",null],
 ["Tom: Yes, we ","(1) plant",["are going to plant","are planting"]," trees behind the gym. Our teacher has already ordered them."],
-["Mia: Great! What time ","(2) it / start",["does it start"],"?"],
+["Mia: Great! What time ","(2) it / start",["does it start","will it start"],"?"],
 ["Tom: At nine. I hope it ","(3) not / rain",["will not rain"],"."],
 ["Mia: If it rains, we ","(4) move",["will move"]," everything into the hall."],
 ["Tom: Good idea. Oh, my phone is ringing again – wait, I ","(5) answer",["will answer"]," it, you carry on."],
 ["Mia: Look at those clouds! It ","(6) rain",["is going to rain"]," any minute."],
-["Tom: Then we ","(7) have",["will have to"]," to hurry."]];
+["Tom: Then we ","(7) have",["will have"]," to hurry."]];
 const TALK=["Will vertical gardens make our cities healthier?","Will people still own their own cars in 2050? Why (not)?","Will drones deliver most of our parcels in the future?","Will ‘smart’ homes help us to use less energy?","What are you going to do this week to protect the planet?","Are you going to travel by plane next summer? Why (not)?","Will cities have more green spaces in twenty years?","Are you going to buy a second-hand phone next time? Why (not)?","Will we all eat less meat in the future?","Is your school going to do something for the environment this year?"];
 const TOPICS={a:["Delivery drones","Drones bring parcels to your door."],b:["E-scooters in our town","People can rent e-scooters with an app."],c:["A green roof on our school","Plants and solar panels on top of the school building."]};
 
@@ -392,7 +392,7 @@ C.structure=()=>{const r=sortCheck("s4",SORT4);
   const o=ordArr();let oo=0;$$("#ord .ord").forEach((d,pos)=>{const good=o[pos]===pos;if(good)oo++;mark($(".chip",d),good,!good)});
   return r.ok===r.all&&oo===o.length};
 C.future=()=>{let ok=0,tot=FA.length+DLG.filter(d=>d[1]).length;
-  $$("#st .item").forEach((it,i)=>{const f=FA[i],a=V("fa"+i),good=a===String(f[2]);mark(it,good,!!a&&!good);const fb=$(".fb",it);fb.className="fb "+(good?"good":"bad");fb.textContent=good?"✓ "+f[3]:(a?"✗ Think again. Which future form fits this situation?":"");if(good)ok++});
+  $$("#st .item").forEach((it,i)=>{const f=FA[i],a=V("fa"+i),good=[].concat(f[2]).map(String).includes(a);mark(it,good,!!a&&!good);const fb=$(".fb",it);fb.className="fb "+(good?"good":"bad");fb.textContent=good?"✓ "+f[3]:(a?"✗ Think again. Which future form fits this situation?":"");if(good)ok++});
   $$("input.gap").forEach(inp=>{const k=+inp.dataset.k.slice(1),d=DLG[k],a=norm(V("d"+k,"")),good=d[2].map(norm).includes(a);mark(inp,good,a!==""&&!good);if(good)ok++});return ok===tot};
 C.talk=()=>[0,1,2].every(i=>V("tk"+i));
 C.final=()=>{const n=(V("ftext","").trim().match(/\S+/g)||[]).length;return n>=80&&[0,1,2,3,4,5].every(i=>V("fc"+i))};
