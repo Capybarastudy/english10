@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Green Way – Unit 2, Topic 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Stencil+One&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: sticky header with progress; a route map of six stations plus a final task; one station is open at a time. */
+:root{--bg:#0E3B4F;--bg2:#08283A;--on-bg:#F2F7F7;--on-bg-muted:#A8C6CC;--surface:#FBFAF6;--surface-2:#E3ECEA;--ink:#14262E;--muted:#4E6268;--line:#C3D1D0;--sea:#0F8B8D;--coral:#F0745A;--sun:#FFC845;--ok:#24965E;--ok-soft:#D4F0E0;--bad:#C8412F;--bad-soft:#FBDCD7;--key:#B8650A;--key-soft:#FFF0CC;
+--f-display:"Saira Stencil One","Impact","Arial Narrow",sans-serif;--f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;-webkit-text-size-adjust:100%;background:radial-gradient(ellipse at 50% -10%,#1C6B80 0%,var(--bg) 45%,var(--bg2) 100%) fixed var(--bg);color:var(--on-bg);font-family:var(--f-body);font-size:17px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg2)}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg2);border-bottom:3px solid var(--ok)}
+.top-in{max-width:900px;margin:0 auto;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:center;gap:14px}
+.brand{font-family:var(--f-display);font-size:22px;line-height:1;margin-right:auto}
+.brand small{display:block;font-family:var(--f-body);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--on-bg-muted);margin-top:3px}
+.prog{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--on-bg-muted)}
+.bar{width:130px;height:10px;border-radius:6px;background:rgba(255,255,255,.15);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--sun);transition:width .3s}
+main{max-width:900px;margin:0 auto;padding-block:26px 70px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--sun);font-weight:700}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(38px,7vw,62px);line-height:1;margin:6px 0 12px;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:400;font-size:clamp(26px,4.5vw,38px);line-height:1.05;margin:4px 0 10px;text-wrap:balance}
+h3{font-size:18px;margin:18px 0 8px}
+p{margin:0 0 12px;max-width:68ch}
+.lead{color:var(--on-bg-muted);font-size:18px}
+.goal{display:inline-block;background:var(--key-soft);color:var(--ink);border-left:6px solid var(--sun);border-radius:6px;padding:10px 14px;margin:6px 0 22px;font-weight:700}
+.route{list-style:none;margin:0;padding:0;position:relative;display:flex;flex-direction:column;gap:14px}
+.route::before{content:"";position:absolute;left:27px;top:20px;bottom:20px;width:6px;border-radius:3px;background:repeating-linear-gradient(to bottom,var(--ok) 0 14px,transparent 14px 24px);opacity:.55}
+.stop{position:relative;display:flex;gap:16px;align-items:stretch}
+.num{flex:none;width:60px;height:60px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-size:28px;background:var(--surface);color:var(--ink);border:4px solid var(--ok);z-index:1;align-self:center}
+.stop.done .num{background:var(--ok);color:#fff}
+.stop.final .num{border-color:var(--sun);background:var(--sun)}
+.card{flex:1;text-align:left;cursor:pointer;background:var(--surface);color:var(--ink);border:3px solid transparent;border-radius:14px;padding:14px 18px;display:flex;flex-direction:column;gap:2px;transition:transform .15s,border-color .15s}
+.card:hover,.card:focus-visible{transform:translateY(-2px);border-color:var(--coral);outline:none}
+.card .t{font-family:var(--f-display);font-size:24px;line-height:1.1}
+.card .s{font-size:15px;color:var(--muted)}
+.card .m{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--key);font-weight:700;margin-top:4px}
+.stop.done .card .m{color:var(--ok)}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:0 0 24px}
+.how div{background:rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;font-size:15px;color:var(--on-bg)}
+.how b{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--sun)}
+.back{background:none;border:0;color:var(--on-bg-muted);cursor:pointer;padding:6px 0;font-size:15px;text-decoration:underline}
+.paper{background:var(--surface);color:var(--ink);border-radius:12px;padding:18px;margin:12px 0}
+.tip{display:flex;gap:10px;background:var(--key-soft);color:var(--ink);border-left:6px solid var(--sun);border-radius:6px;padding:10px 14px;margin:10px 0;font-size:16px}
+.item{background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:10px;padding:12px 14px;margin:10px 0}
+.item.ok{border-color:var(--ok);background:var(--ok-soft)}.item.bad{border-color:var(--bad);background:var(--bad-soft)}
+.item .q{margin:0 0 8px}.item .q b{color:var(--key);margin-right:6px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{min-height:44px;padding:8px 14px;border-radius:8px;border:2px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;font-weight:700}
+.opt[aria-pressed=true]{background:var(--sea);border-color:var(--sea);color:#fff}
+.fb{font-size:15px;margin:8px 0 0;color:var(--ink)}
+.fb.bad{color:var(--bad);font-weight:700}.fb.good{color:var(--ok);font-weight:700}
+.btn{min-height:46px;padding:10px 18px;border-radius:9px;border:2px solid var(--coral);background:var(--coral);color:#fff;font-weight:700;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--on-bg);border-color:rgba(255,255,255,.4)}
+.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0}
+.result{font-weight:700;padding:8px 0}
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;padding:10px;border:2px dashed var(--on-bg-muted);border-radius:10px;margin:10px 0}
+.chip{min-height:44px;padding:8px 12px;border-radius:8px;background:#fff;color:var(--ink);border:2px solid var(--line);cursor:pointer;text-align:left;font-size:16px}
+.chip.sel{border-color:var(--sun);box-shadow:0 0 0 3px var(--sun)}.chip.ok{background:var(--ok-soft);border-color:var(--ok)}.chip.bad{background:var(--bad-soft);border-color:var(--bad)}
+.buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.bucket{background:var(--surface);color:var(--ink);border:3px solid var(--line);border-radius:12px;padding:10px;min-height:140px;cursor:pointer}
+.bucket h4{margin:0 0 8px;font-family:var(--f-display);font-weight:400;font-size:22px}
+.bucket.pro h4{color:var(--ok)}.bucket.con h4{color:var(--bad)}.bucket.str h4{color:var(--sea)}
+.bucket.armed{border-color:var(--sun);background:#FFF9E5}
+.bucket .chips{display:flex;flex-direction:column;gap:6px}
+select,input[type=text],textarea{background:#fff;color:var(--ink);border:2px solid var(--line);border-radius:8px;padding:8px 10px;min-height:44px}
+input.gap{width:min(100%,230px);margin:0 4px;border-style:solid;border-width:0 0 3px;border-radius:0;background:#F1F6F5}
+input.gap.ok,select.ok{border-color:var(--ok);background:var(--ok-soft)}input.gap.bad,select.bad{border-color:var(--bad);background:var(--bad-soft)}
+textarea{width:100%;min-height:150px;line-height:1.6}
+.dlg p{max-width:none;line-height:2.1}
+.ord{display:flex;gap:8px;align-items:stretch;margin:6px 0}
+.ord .chip{flex:1;cursor:default}.ord .ar{display:flex;flex-direction:column;gap:4px}.ord .ar button{flex:1;min-width:44px;border:2px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);cursor:pointer;font-weight:700}
+.cards{background:var(--surface);color:var(--ink);border-radius:14px;padding:20px;text-align:center;font-size:22px;font-weight:700;min-height:120px;display:grid;place-items:center;border:4px solid var(--sea)}
+.checks label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;color:var(--ink)}
+.checks input{width:24px;height:24px;flex:none;accent-color:var(--ok)}
+.wc{font-size:14px;color:var(--muted)}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.pair div{background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 14px;font-size:15px}
+.pair b{color:var(--coral)}
+@media print{body{background:#fff;color:#000}.top,.back,.btn{display:none}}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in"><div class="brand">The Green Way<small>Unit 2 · Topic 1 · pp. 36–38</small></div><div class="prog"><span id="pt">0 / 7</span><div class="bar"><i id="pb" style="width:0%"></i></div></div></div></header>
+<main id="app"></main>
+<script>
+"use strict";
+const KEY="cs-english10-u2t1-v1";
+let S={done:{},v:{},stat:{}};
+try{S=Object.assign(S,JSON.parse(localStorage.getItem(KEY)||"null")||{})}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const V=(k,d)=>S.v[k]===undefined?d:S.v[k];
+const setV=(k,x)=>{S.v[k]=x;save()};
+const norm=s=>String(s).toLowerCase().replace(/[’`]/g,"'").replace(/won't/g,"will not").replace(/'ll/g," will").replace(/'m/g," am").replace(/'re/g," are").replace(/'s going/g," is going").replace(/\bi'd\b/g,"i would").replace(/[.!?]/g,"").replace(/\s+/g," ").trim();
+
+/* ---------- data ---------- */
+const READ=[
+["The Vía Verde scheme grows plants up the concrete columns of motorways.","T","Lines 13–17: the plants grow up the sides of the motorway columns."],
+["The plants grow in material that is made from recycled plastic bottles.","T","Lines 27–29."],
+["The project was cheap to build.","F","Lines 31–33: the costs are ‘sky-high’ and hard to justify."],
+["The plants can turn a lot of carbon into oxygen.","F","Lines 36–40: the species used are not able to do this, so the air is hardly better."],
+["Diana Santiago thinks the plants will make people drive less.","F","Lines 40–46: she says the plants encourage more people to drive."],
+["The mayor of Mexico City designed the scheme himself.","N","Not in the text – nobody is named as the designer."],
+["Supporters claim that the plants absorb noise and heat.","T","Lines 47–50."],
+["Other cities have already finished similar projects.","F","Lines 20–22: other cities are only ‘about to start’ similar projects."]];
+const SORT2=[
+["Plants grow in material made from recycled plastic bottles.","pro"],["Sensors make sure that no water is wasted.","pro"],["The plants increase biodiversity in the city.","pro"],["They absorb noise and heat from the traffic.","pro"],["Motorists feel less stressed.","pro"],
+["The costs are sky-high.","con"],["The air quality is only slightly better.","con"],["The scheme may encourage even more people to drive.","con"],["The plants cannot convert carbon into oxygen.","con"]];
+const WORDS=["sustainable","claim","sky-high","justify","in favour of","key","moreover","harmful"];
+const SORT4=[
+["A great advantage is …","pro"],["The good thing about … is …","pro"],["The main benefit is …","pro"],
+["One serious problem is …","con"],["The biggest disadvantage is …","con"],["One argument against … is …","con"],
+["Moreover, …","str"],["On the one hand, … On the other hand, …","str"],["In summary, …","str"],["However, …","str"]];
+const ORDER=[
+"Smart homes are becoming more popular, but are they really a good idea?",
+"One big advantage is that you can control the lights and the heating with your phone, so you can save energy.",
+"Moreover, family members who are away can check that the doors are locked.",
+"On the other hand, smart devices are expensive, and not everybody can afford them.",
+"Another problem is that they need electricity all the time and can be hacked.",
+"In summary, smart homes have clear advantages, but they will only help the planet if people use them carefully."];
+const FA=[
+["My train ___ at 7.45 tomorrow morning.",["leaves","will leave","is going to leave"],0,"A timetable is a fixed schedule, so we use the simple present."],
+["Look at those black clouds! It ___ any minute.",["will rain","is going to rain","rains"],1,"There are signs now (the clouds), so we use going to."],
+["I hope the plants ___ well this summer.",["will grow","are growing","grows"],0,"After I hope / I think / I’m sure we use will."],
+["– I’ve got no pen. – Don’t worry, I ___ you one.",["am lending","will lend","lend"],1,"A spontaneous decision needs will."],
+["We ___ our new school garden on Saturday. The tools are ready.",["will start","start","are starting"],2,"A fixed arrangement with preparations made: present progressive (going to is also fine)."],
+["If it ___ tomorrow, we will stay at home.",["will rain","rains","is raining"],1,"In an if-clause (type 1) we use the simple present, not will."]];
+const DLG=[
+["Mia: Have you decided what to do on Eco Day?",null],
+["Tom: Yes, we ","(1) plant",["are going to plant","are planting"]," trees behind the gym. Our teacher has already ordered them."],
+["Mia: Great! What time ","(2) it / start",["does it start"],"?"],
+["Tom: At nine. I hope it ","(3) not / rain",["will not rain"],"."],
+["Mia: If it rains, we ","(4) move",["will move"]," everything into the hall."],
+["Tom: Good idea. Oh, my phone is ringing again – wait, I ","(5) answer",["will answer"]," it, you carry on."],
+["Mia: Look at those clouds! It ","(6) rain",["is going to rain"]," any minute."],
+["Tom: Then we ","(7) have",["will have to"]," to hurry."]];
+const TALK=["Will vertical gardens make our cities healthier?","Will people still own their own cars in 2050? Why (not)?","Will drones deliver most of our parcels in the future?","Will ‘smart’ homes help us to use less energy?","What are you going to do this week to protect the planet?","Are you going to travel by plane next summer? Why (not)?","Will cities have more green spaces in twenty years?","Are you going to buy a second-hand phone next time? Why (not)?","Will we all eat less meat in the future?","Is your school going to do something for the environment this year?"];
+const TOPICS={a:["Delivery drones","Drones bring parcels to your door."],b:["E-scooters in our town","People can rent e-scooters with an app."],c:["A green roof on our school","Plants and solar panels on top of the school building."]};
+
+/* ---------- stations ---------- */
+const stations=[
+{id:"read",t:"Read & check",s:"Newspaper article, p. 36 · true, false or not in the text",m:"≈ 10 min · reading"},
+{id:"proscons",t:"Pros & cons",s:"Sort the arguments from the article",m:"≈ 10 min · reading"},
+{id:"words",t:"Key words",s:"Topic 1 vocabulary in context",m:"≈ 8 min · vocabulary"},
+{id:"structure",t:"Structure your arguments",s:"Useful phrases and a model paragraph",m:"≈ 12 min · writing skills"},
+{id:"future",t:"Talking about the future",s:"will · going to · present progressive · simple present (G5, p. 149)",m:"≈ 12 min · grammar"},
+{id:"talk",t:"Talk about it",s:"Partner work: questions about the future (p. 38)",m:"≈ 10 min · speaking"},
+{id:"final",t:"Final task",s:"Write your own pros-and-cons text",m:"≈ 25 min · writing",final:true},
+{id:"cert",t:"My certificate",s:"Create a PDF with your results to upload",m:"≈ 3 min · results",cert:true}];
+const work=()=>stations.filter(s=>!s.cert);
+const doneCount=()=>work().filter(s=>S.done[s.id]).length;
+function progress(){const n=doneCount();$("#pt").textContent=n+" / "+work().length;$("#pb").style.width=(n/work().length*100)+"%"}
+
+function home(){
+  history.replaceState(null,"",location.pathname+location.search);
+  $("#app").innerHTML=`<div class="eyebrow">Unit 2 · Topic 1 · Student book pp. 36–38</div><h1>The Green Way</h1>
+  <p class="lead">Can plants on a motorway really clean the air of a big city? Work through six stations, write your own text and create your certificate.</p>
+  <div class="goal">By the end you can describe the pros and cons of a technological development.</div>
+  <div class="how"><div><b>Order</b>Do the stations in the order you like. Do the final task last.</div><div><b>Help</b>Use the hints, then check. You can try again as often as you like.</div><div><b>Material</b>Keep your student book open at pp. 36–38.</div></div>
+  <ol class="route">${stations.map((s,i)=>`<li class="stop ${S.done[s.id]?"done":""} ${s.final||s.cert?"final":""}"><span class="num">${s.cert?"★":S.done[s.id]?"✓":i+1}</span><button class="card" type="button" data-go="${s.id}"><span class="t">${esc(s.t)}</span><span class="s">${esc(s.s)}</span><span class="m">${S.done[s.id]&&!s.cert?"Done ✓":esc(s.m)}</span></button></li>`).join("")}</ol>
+  <div class="row"><button class="btn ghost" type="button" data-act="reset">Start again</button></div>`;
+  progress();window.scrollTo(0,0);
+}
+function open(id){
+  const st=stations.find(s=>s.id===id);history.replaceState(null,"","#"+id);
+  $("#app").innerHTML=`<button class="back" type="button" data-act="home">← Back to the map</button><div class="eyebrow">${st.cert?"Last step":"Station "+(stations.indexOf(st)+1)+" of "+work().length}</div><h2>${esc(st.t)}</h2><div id="st">${R[id]()}</div>`;
+  window.scrollTo(0,0);wc();
+}
+function finish(id,ok,msg){
+  const r=$("#res");if(!r)return;
+  r.className="result";r.style.color=ok?"#8FE3B5":"#FFC845";r.textContent=msg;
+  if(ok&&!S.done[id]){S.done[id]=1;save();progress()}
+}
+const chk=(id)=>`<div class="row"><button class="btn" type="button" data-act="check" data-st="${id}">Check</button><button class="btn ghost" type="button" data-act="show" data-st="${id}">Show answers</button></div><div id="res" class="result" role="status"></div>`;
+
+const R={};
+/* 1 read */
+R.read=()=>`<p>Read the newspaper article ‘Can vertical gardens help stop pollution?’ on p. 36. Is each statement <b>true</b>, <b>false</b> or <b>not in the text</b>?</p>
+<div class="tip"><b>Tip</b><span>For ‘false’ and ‘not in the text’, find the lines first. If the text says something different, it is false. If the text says nothing about it, it is not in the text.</span></div>
+${READ.map((r,i)=>`<div class="item" data-i="${i}"><p class="q"><b>${i+1}</b>${esc(r[0])}</p><div class="opts">${[["T","True"],["F","False"],["N","Not in the text"]].map(o=>`<button class="opt" type="button" data-k="read${i}" data-val="${o[0]}" aria-pressed="${V("read"+i)===o[0]}">${o[1]}</button>`).join("")}</div><p class="fb"></p></div>`).join("")}${chk("read")}`;
+/* 2 pros cons */
+function sortRender(key,items,buckets,pool){
+  const p=V(key,{}),sel=V(key+"sel",null);
+  const chip=(x,i,inB)=>`<button class="chip ${sel===i?"sel":""}" type="button" data-chip="${key}:${i}">${esc(x[0])}</button>`;
+  return `<div class="pool" id="${key}pool">${items.map((x,i)=>p[i]?"":chip(x,i)).join("")||"<span style='color:var(--on-bg-muted)'>All sorted – press Check.</span>"}</div>
+  <div class="buckets">${buckets.map(b=>`<div class="bucket ${b[0]} ${sel!==null?"armed":""}" data-bucket="${key}:${b[0]}" role="button" tabindex="0"><h4>${b[1]}</h4><div class="chips">${items.map((x,i)=>p[i]===b[0]?chip(x,i,1):"").join("")}</div></div>`).join("")}</div>`;
+}
+R.proscons=()=>`<p>Tap an argument, then tap the box where it belongs. Tap a sorted argument to take it out again.</p>
+<div id="sort2">${sortRender("s2",SORT2,[["pro","Pros 👍"],["con","Cons 👎"]])}</div>
+<h3>What does the author think?</h3>
+<div class="item" id="s2q"><p class="q">According to the author, which point is the most important one?</p><div class="opts" style="flex-direction:column;align-items:stretch">${[["a","The plants make the motorway look nicer."],["b","The scheme has not reduced the number of cars, so pollution is still a problem."],["c","The plants need too much water."]].map(o=>`<button class="opt" style="text-align:left" type="button" data-k="s2q" data-val="${o[0]}" aria-pressed="${V("s2q")===o[0]}">${o[1]}</button>`).join("")}</div><p class="fb"></p></div>
+<h3>Your opinion <span style="font-weight:400;color:var(--on-bg-muted)">(book p. 37, task 4c)</span></h3>
+<p>Can you imagine a project like this in a city near you? Give reasons.</p>
+<textarea data-text="s2opinion" placeholder="I think / I don't think … because …">${esc(V("s2opinion",""))}</textarea>${chk("proscons")}`;
+/* 3 words */
+R.words=()=>`<p>Choose the right word or phrase for each gap. Every word is used once.</p>`+wordsHtml()+chk("words");
+function wordsHtml(){
+  const parts=["A town wants to build a solar roof over its school. Supporters say it is very ","(1)"," because it produces clean energy. They ","(2)"," that it will cut the electricity bills by half. However, the building costs are ","(3)",". Some parents ask how the council can ","(4)"," spending so much money. They are not ","(5)"," the plan. ","(6)",", the roof might make the classrooms darker. The ","(7)"," question is: who will pay? Diesel buses are ","(8)"," to our health, but a solar roof will not solve that problem."];
+  let g=0;
+  const html=parts.map(p=>{if(/^\(\d\)$/.test(p)){const i=g++;return `<select data-k="w${i}" aria-label="gap ${i+1}"><option value="">${i+1} …</option>${WORDS.map(w=>`<option ${V("w"+i)===w?"selected":""}>${w}</option>`).join("")}</select>`}return esc(p)}).join("");
+  return `<div class="tip"><b>Word bank</b><span>${WORDS.map(esc).join(" · ")}</span></div><div class="paper dlg"><p>${html}</p></div>`;
+}
+const WANS=["sustainable","claim","sky-high","justify","in favour of","moreover","key","harmful"];
+/* 4 structure */
+R.structure=()=>`<h3>A · Sort the phrases</h3><p>Which phrases introduce a <b>pro</b>, which a <b>con</b>, and which only <b>structure</b> your text?</p>
+<div id="sort4">${sortRender("s4",SORT4,[["pro","Pros"],["con","Cons"],["str","Structure"]])}</div>
+<h3>B · Put the text in the right order</h3><p>These sentences form a short pros-and-cons paragraph about ‘smart homes’. Use the arrows.</p>
+<div id="ord">${ordRender()}</div>${chk("structure")}`;
+function ordArr(){let o=V("ord",null);if(!o){o=[3,0,5,2,4,1];}return o}
+function ordRender(){return ordArr().map((n,pos)=>`<div class="ord"><button class="chip" type="button" style="cursor:default" data-n="${n}">${esc(ORDER[n])}</button><div class="ar"><button type="button" data-mv="${pos}:-1" aria-label="move up">▲</button><button type="button" data-mv="${pos}:1" aria-label="move down">▼</button></div></div>`).join("")}
+/* 5 future */
+R.future=()=>`<h3>A · Which form is best?</h3>
+${FA.map((f,i)=>{const p=f[0].split("___");return `<div class="item" data-i="${i}"><p class="q"><b>${i+1}</b>${esc(p[0])}<select data-k="fa${i}"><option value="">…</option>${f[1].map((o,j)=>`<option value="${j}" ${V("fa"+i)===String(j)?"selected":""}>${esc(o)}</option>`).join("")}</select>${esc(p[1]||"")}</p><p class="fb"></p></div>`}).join("")}
+<h3>B · Complete the dialogue</h3><p>Use the verb in brackets. Some gaps have more than one correct answer.</p>
+<div class="paper dlg">${DLG.map(d=>d[1]===null?`<p>${esc(d[0])}</p>`:`<p>${esc(d[0])}<input class="gap" type="text" data-k="d${DLG.indexOf(d)}" value="${esc(V("d"+DLG.indexOf(d),""))}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="${esc(d[1])}"> <span style="color:var(--muted);font-size:14px">${esc(d[1])}</span>${esc(d[3])}</p>`).join("")}</div>${chk("future")}`;
+/* 6 talk */
+R.talk=()=>`<p>Work with a partner. Take turns: one person asks the question on the card, the other answers with <b>a reason</b>. Then swap roles.</p>
+<div class="cards" id="card" aria-live="polite">${esc(V("card",TALK[0]))}</div>
+<div class="row"><button class="btn" type="button" data-act="next">Next question →</button></div>
+<div class="pair"><div><b>Answering</b><br>Yes, … will … because … / No, … won't … because … / I'm going to … because …</div><div><b>Asking more</b><br>Why do you think so? / What makes you say that? / Are you sure?</div><div><b>Agree / disagree</b><br>I see your point, but … / I'm afraid I don't agree. / From my point of view, …</div></div>
+<h3>Check yourselves</h3><div class="checks paper">${["We used will and going to correctly.","We gave a reason every time.","We spoke English the whole time."].map((c,i)=>`<label><input type="checkbox" data-k="tk${i}" ${V("tk"+i)?"checked":""}> ${c}</label>`).join("")}</div>
+<div class="row"><button class="btn" type="button" data-act="check" data-st="talk">We have finished</button></div><div id="res" class="result" role="status"></div>`;
+/* 7 final */
+R.final=()=>{const t=V("ftopic","a");return `<p>Write a short text for your school website: <b>What are the pros and cons of this development?</b></p>
+<div class="opts" style="margin:10px 0">${Object.entries(TOPICS).map(([k,v])=>`<button class="opt" type="button" data-topic="${k}" aria-pressed="${t===k}">${esc(v[0])}</button>`).join("")}</div>
+<div class="tip"><b>Topic</b><span>${esc(TOPICS[t][0])}: ${esc(TOPICS[t][1])}</span></div>
+<div class="pair"><div><b>Plan</b><br>Pros: ……<br>Cons: ……<br>My opinion: ……</div><div><b>Language</b><br>A great advantage is … · One serious problem is … · Moreover, … · On the one hand … on the other hand … · In summary, …</div><div><b>Future</b><br>Use at least two future forms: In ten years, … will … · The town is going to …</div></div>
+<h3>Your text <span style="font-weight:400;color:var(--on-bg-muted)">(about 120 words)</span></h3>
+<textarea data-text="ftext" style="min-height:260px" placeholder="Start with a sentence that introduces the topic …">${esc(V("ftext",""))}</textarea><div class="wc" style="color:var(--on-bg-muted)" id="wc"></div>
+<h3>Checklist</h3><div class="checks paper">${["I introduced the topic in one or two sentences.","I gave at least two pros and two cons.","I used linking words (moreover, however, on the other hand …).","I used at least two future forms correctly.","I finished with my own opinion (In summary, …).","I checked spelling and tenses."].map((c,i)=>`<label><input type="checkbox" data-k="fc${i}" ${V("fc"+i)?"checked":""}> ${c}</label>`).join("")}</div>
+<div class="row"><button class="btn" type="button" data-act="copy">Copy my text</button><button class="btn light" type="button" data-act="dl">Download as .txt</button><button class="btn" type="button" data-act="check" data-st="final" style="background:var(--ok);border-color:var(--ok)">I have finished</button></div><div id="res" class="result" role="status"></div>`};
+
+
+R.cert=()=>`<p>Fill in your name. The certificate shows which stations you have finished and includes your final text. <b>Download the PDF and upload it</b> where your teacher asks you to (for example in the class folder).</p>
+<div class="paper"><label style="display:block;font-weight:700;margin-bottom:6px" for="cname">Your name</label><input id="cname" type="text" data-k="cname" style="width:100%;margin-bottom:12px" autocomplete="name" value="${esc(V("cname",""))}"><label style="display:block;font-weight:700;margin-bottom:6px" for="cclass">Class</label><input id="cclass" type="text" data-k="cclass" style="width:100%" value="${esc(V("cclass",""))}" placeholder="e.g. 10a"></div>
+<div class="row"><button class="btn" type="button" data-act="mkcert">Create my certificate</button><button class="btn light" type="button" data-act="dlpdf" id="dlpdf" hidden>Download PDF</button></div>
+<div id="cres" class="result" role="status"></div><div id="cprev"></div>`;
+function stationStatus(s){const z=(S.stat||{})[s.id]||{};if(!S.done[s.id])return["open","Not finished yet"];if(z.ok){return["ok",z.checks<=1?"Solved at the first check":"Solved after "+z.checks+" checks"]}if(z.shown)return["shown","Finished with answers shown"];return["ok","Finished"]}
+function wrap(ctx,text,max){const out=[];text.split(/\n/).forEach(par=>{let line="";par.split(/\s+/).filter(Boolean).forEach(w=>{const t=line?line+" "+w:w;if(ctx.measureText(t).width>max&&line){out.push(line);line=w}else line=t});out.push(line)});return out}
+function drawCert(){
+  const W=1654,H=2339,pages=[];const mk=()=>{const c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,W,H);return[c,x]};
+  const F='"Atkinson Hyperlegible","Segoe UI",Arial,sans-serif',D='"Saira Stencil One",Impact,Arial,sans-serif';
+  let [c,x]=mk();pages.push(c);
+  x.fillStyle="#0E3B4F";x.fillRect(0,0,W,330);x.fillStyle="#2E9E6A";x.fillRect(0,330,W,14);
+  x.fillStyle="#FFC845";x.font="700 30px "+F;x.fillText("UNIT 2 · TOPIC 1 · STUDENT BOOK PP. 36–38",90,110);
+  x.fillStyle="#fff";x.font="96px "+D;x.fillText("The Green Way",90,215);
+  x.font="700 40px "+F;x.fillStyle="#A8C6CC";x.fillText("Learning path certificate",90,282);
+  // seal
+  x.beginPath();x.arc(1450,170,100,0,7);x.fillStyle="#FFC845";x.fill();x.lineWidth=8;x.strokeStyle="#fff";x.stroke();
+  x.beginPath();x.moveTo(1405,170);x.lineTo(1440,208);x.lineTo(1500,128);x.lineWidth=18;x.lineCap="round";x.lineJoin="round";x.strokeStyle="#0E3B4F";x.stroke();
+  const name=V("cname","").trim()||"(no name)",cl=V("cclass","").trim(),d=new Date();
+  const ds=String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+"."+d.getFullYear();
+  x.fillStyle="#14262E";x.font="700 30px "+F;x.fillText("NAME",90,430);x.fillText("CLASS",900,430);x.fillText("DATE",1310,430);
+  x.font="54px "+F;x.fillText(name.slice(0,26),90,495);x.fillText(cl.slice(0,8)||"–",900,495);x.font="44px "+F;x.fillText(ds,1310,492);
+  x.fillStyle="#C3D1D0";x.fillRect(90,515,1474,3);
+  const n=doneCount(),tot=work().length;
+  x.fillStyle="#14262E";x.font="700 40px "+F;const sh=work().filter(q=>S.done[q.id]&&!((S.stat||{})[q.id]||{}).ok&&((S.stat||{})[q.id]||{}).shown).length;x.fillText("Stations finished: "+n+" of "+tot+(sh?"  ("+sh+" with answers shown)":""),90,610);
+  x.fillStyle="#E3ECEA";x.fillRect(90,635,1474,34);x.fillStyle="#2E9E6A";x.fillRect(90,635,1474*n/tot,34);
+  let y=760;
+  work().forEach((s,i)=>{const[st,txt]=stationStatus(s);
+    x.beginPath();x.arc(135,y-16,34,0,7);x.fillStyle=st==="open"?"#E3ECEA":st==="shown"?"#FFC845":"#2E9E6A";x.fill();
+    x.fillStyle=st==="open"?"#4E6268":st==="shown"?"#14262E":"#fff";x.font="700 38px "+F;x.textAlign="center";x.fillText(st==="open"?String(i+1):st==="shown"?"!":"✓",135,y-3);x.textAlign="left";
+    x.fillStyle="#14262E";x.font="700 42px "+F;x.fillText(s.t,205,y-4);
+    x.fillStyle="#4E6268";x.font="34px "+F;x.fillText(txt,205,y+38);
+    x.fillStyle="#E3ECEA";x.fillRect(205,y+62,1359,2);y+=118});
+  y+=20;x.fillStyle="#0E3B4F";x.font="700 44px "+F;x.fillText("My final text",90,y);
+  const t=V("ftext","").trim();x.font="36px "+F;x.fillStyle="#14262E";
+  const lines=t?wrap(x,t,1470):["(no text written yet)"];
+  const wc=(t.match(/\S+/g)||[]).length;
+  x.fillStyle="#4E6268";x.font="30px "+F;x.fillText(wc+" words · topic: "+TOPICS[V("ftopic","a")][0],90,y+44);
+  let ly=y+100;const lh=54;let cx=x;
+  const foot=(ctx,pg,np)=>{ctx.fillStyle="#9AA5AE";ctx.font="28px "+F;ctx.fillText("Capybarastudy · English 10 · Red Line 6 · created on my device",90,H-70);ctx.textAlign="right";ctx.fillText("Page "+pg+" / "+np,W-90,H-70);ctx.textAlign="left"};
+  const out=[];let pg=0;
+  lines.forEach(l=>{if(ly>H-170){out.push(cx);[c,cx]=mk();pages.push(c);ly=140}cx.fillStyle="#14262E";cx.font="36px "+F;cx.fillText(l,90,ly);ly+=lh});
+  pages.forEach((p,i)=>foot(p.getContext("2d"),i+1,pages.length));
+  return pages;
+}
+function b64bytes(u){const b=atob(u.split(",")[1]);const a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a}
+function buildPdf(pages){
+  const enc=new TextEncoder(),parts=[],off=[];let len=0;
+  const add=d=>{const u=typeof d==="string"?enc.encode(d):d;parts.push(u);len+=u.length};
+  const obj=(n,body)=>{off[n]=len;add(n+" 0 obj\n");add(body);add("\nendobj\n")};
+  add("%PDF-1.4\n");
+  const N=pages.length;obj(1,"<< /Type /Catalog /Pages 2 0 R >>");
+  obj(2,"<< /Type /Pages /Count "+N+" /Kids ["+pages.map((_,i)=>(3+i*3)+" 0 R").join(" ")+"] >>");
+  pages.forEach((c,i)=>{const b=3+i*3,jpg=b64bytes(c.toDataURL("image/jpeg",.9));
+    obj(b,"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 "+(b+2)+" 0 R >> >> /Contents "+(b+1)+" 0 R >>");
+    const cs="q 595.28 0 0 841.89 0 0 cm /Im0 Do Q";obj(b+1,"<< /Length "+cs.length+" >>\nstream\n"+cs+"\nendstream");
+    off[b+2]=len;add((b+2)+" 0 obj\n<< /Type /XObject /Subtype /Image /Width "+c.width+" /Height "+c.height+" /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length "+jpg.length+" >>\nstream\n");add(jpg);add("\nendstream\nendobj\n")});
+  const total=3+N*3,xr=len;let t="xref\n0 "+total+"\n0000000000 65535 f \n";for(let i=1;i<total;i++)t+=String(off[i]).padStart(10,"0")+" 00000 n \n";
+  add(t+"trailer\n<< /Size "+total+" /Root 1 0 R >>\nstartxref\n"+xr+"\n%%EOF");
+  return new Blob(parts,{type:"application/pdf"});
+}
+let lastPdf=null;
+function mkcert(){
+  const pages=drawCert();lastPdf=buildPdf(pages);
+  $("#cprev").innerHTML=pages.map(p=>`<img alt="Certificate preview" style="width:100%;max-width:560px;border-radius:8px;margin:10px 10px 0 0;background:#fff" src="${p.toDataURL("image/jpeg",.8)}">`).join("");
+  $("#dlpdf").hidden=false;
+  $("#cres").textContent="Your certificate is ready. Download the PDF and upload it.";$("#cres").style.color="#8FE3B5";
+}
+
+/* ---------- checks ---------- */
+const C={};
+C.read=(show)=>{let ok=0;$$(".item").forEach((it,i)=>{const r=READ[i];if(show)setV("read"+i,r[1]);const a=V("read"+i);it.classList.toggle("ok",a===r[1]);it.classList.toggle("bad",!!a&&a!==r[1]);const f=$(".fb",it);f.className="fb "+(a===r[1]?"good":"bad");f.textContent=a===r[1]?"✓ "+r[2]:(a?"✗ Look again. "+r[2].split(":")[0]+".":"Choose an answer.");if(a===r[1])ok++;if(show){$$("[data-k]",it).forEach(b=>b.setAttribute("aria-pressed",b.dataset.val===r[1]))}});return ok===READ.length};
+function sortCheck(key,items,show){const p=V(key,{});if(show){items.forEach((x,i)=>p[i]=x[1]);setV(key,p);setV(key+"sel",null)}let ok=0;items.forEach((x,i)=>{if(p[i]===x[1])ok++});return{ok,all:items.length,p}}
+C.proscons=(show)=>{const r=sortCheck("s2",SORT2,show);if(show){setV("s2q","b");rerender("sort2",()=>sortRender("s2",SORT2,[["pro","Pros 👍"],["con","Cons 👎"]]))}
+  $$("#sort2 .bucket .chip").forEach(c=>{const i=+c.dataset.chip.split(":")[1];c.classList.toggle("ok",r.p[i]===SORT2[i][1]);c.classList.toggle("bad",r.p[i]!==SORT2[i][1])});
+  const q=V("s2q"),it=$("#s2q");it.classList.toggle("ok",q==="b");it.classList.toggle("bad",!!q&&q!=="b");$(".fb",it).textContent=q==="b"?"✓ Yes: the scheme has not reduced the number of cars on the roads.":(q?"✗ Read the last paragraph again (lines 53–58).":"");$$("[data-k=s2q]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.val==="b"));
+  return r.ok===r.all&&q==="b"};
+C.words=(show)=>{let ok=0;$$("select[data-k^=w]").forEach((s,i)=>{if(show){setV("w"+i,WANS[i]);s.value=WANS[i]}const a=V("w"+i);s.classList.toggle("ok",a===WANS[i]);s.classList.toggle("bad",!!a&&a!==WANS[i]);if(a===WANS[i])ok++});return ok===WANS.length};
+C.structure=(show)=>{const r=sortCheck("s4",SORT4,show);if(show){setV("ord",[0,1,2,3,4,5]);rerender("sort4",()=>sortRender("s4",SORT4,[["pro","Pros"],["con","Cons"],["str","Structure"]]));rerender("ord",ordRender)}
+  $$("#sort4 .bucket .chip").forEach(c=>{const i=+c.dataset.chip.split(":")[1];c.classList.toggle("ok",r.p[i]===SORT4[i][1]);c.classList.toggle("bad",r.p[i]!==SORT4[i][1])});
+  const o=ordArr();let oo=0;$$("#ord .ord").forEach((d,pos)=>{const good=o[pos]===pos;if(good)oo++;$(".chip",d).classList.toggle("ok",good);$(".chip",d).classList.toggle("bad",!good)});
+  return r.ok===r.all&&oo===o.length};
+C.future=(show)=>{let ok=0,tot=FA.length+DLG.filter(d=>d[1]).length;
+  $$("#st .item").forEach((it,i)=>{const f=FA[i];if(show){setV("fa"+i,String(f[2]));$("select",it).value=String(f[2])}const a=V("fa"+i);const good=a===String(f[2]);it.classList.toggle("ok",good);it.classList.toggle("bad",a!==undefined&&a!==""&&!good);$(".fb",it).className="fb "+(good?"good":"bad");$(".fb",it).textContent=good?"✓ "+f[3]:(a?"✗ Think again. "+f[3].split(",")[0]+"…":"");if(good)ok++});
+  $$("input.gap").forEach(inp=>{const k=+inp.dataset.k.slice(1);const d=DLG[k];if(show){setV("d"+k,d[2][0]);inp.value=d[2][0]}const a=norm(V("d"+k,""));const good=d[2].map(norm).includes(a);inp.classList.toggle("ok",good);inp.classList.toggle("bad",a!==""&&!good);if(good)ok++});return ok===tot};
+C.talk=()=>[0,1,2].every(i=>V("tk"+i));
+C.final=()=>{const n=(V("ftext","").trim().match(/\S+/g)||[]).length;return n>=80&&[0,1,2,3,4,5].every(i=>V("fc"+i))};
+function rerender(id,fn){const e=$("#"+id);if(e)e.innerHTML=fn()}
+const MSG={read:["Perfect – all eight correct!","Not quite yet. Look at the red items and the line numbers."],proscons:["Great – you found all the arguments.","Some arguments are in the wrong box, or the question is still open."],words:["All gaps correct!","Some gaps are wrong – read the sentence again."],structure:["Excellent – phrases and paragraph are correct.","Not yet right. Check the phrases and the order of the sentences."],future:["Brilliant – all future forms are correct.","Some answers are wrong. Check the rules on p. 149."],talk:["Well done! Talk to your teacher if you want more practice.","Tick all three boxes when you have finished."],final:["Text finished – show it to your teacher or a partner.","Write at least 80 words and tick every item on the checklist."]};
+
+/* ---------- events ---------- */
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button,[data-bucket]");if(!t)return;
+  if(t.dataset.go)return open(t.dataset.go);
+  const a=t.dataset.act;
+  if(a==="home")return home();
+  if(a==="reset"){if(confirm("Delete all progress on this device?")){S={done:{},v:{},stat:{}};save();home()}return}
+  if(a==="check"||a==="show"){const id=t.dataset.st;const ok=C[id](a==="show");const st=(S.stat=S.stat||{});const z=st[id]=st[id]||{checks:0};if(a==="show"){z.shown=1}else{z.checks++;if(ok)z.ok=1}if(a==="show"){S.done[id]=1;save();progress();finish(id,true,"Answers shown. Read them carefully and try to understand each one.");return}save();finish(id,ok,MSG[id][ok?0:1]);return}
+  if(a==="mkcert"){mkcert();return}
+  if(a==="dlpdf"){if(!lastPdf)mkcert();const l=document.createElement("a");l.href=URL.createObjectURL(lastPdf);const n=(V("cname","").trim()||"certificate").replace(/[^\w\-äöüÄÖÜß]+/g,"_");l.download="GreenWay_"+n+".pdf";document.body.appendChild(l);l.click();l.remove();return}
+  if(a==="next"){const cur=V("card",TALK[0]);let n;do{n=TALK[Math.floor(Math.random()*TALK.length)]}while(n===cur);setV("card",n);$("#card").textContent=n;return}
+  if(a==="copy"){const x=V("ftext","");(navigator.clipboard?navigator.clipboard.writeText(x):Promise.reject()).then(()=>finish("final",false,"Copied!"),()=>{$("[data-text=ftext]").select();finish("final",false,"Select the text and copy it.")});return}
+  if(a==="dl"){const b=new Blob([V("ftext","")],{type:"text/plain"});const l=document.createElement("a");l.href=URL.createObjectURL(b);l.download="my-text.txt";l.click();return}
+  if(t.dataset.k&&t.dataset.val){setV(t.dataset.k,t.dataset.val);$$("[data-k="+t.dataset.k+"]").forEach(b=>b.setAttribute("aria-pressed",b===t));return}
+  if(t.dataset.topic){setV("ftopic",t.dataset.topic);rerender("st",R.final);wc();return}
+  if(t.dataset.mv){const[p,d]=t.dataset.mv.split(":").map(Number);const o=ordArr().slice(),q=p+d;if(q<0||q>=o.length)return;[o[p],o[q]]=[o[q],o[p]];setV("ord",o);rerender("ord",ordRender);return}
+  const c=t.dataset.chip,b=t.dataset.bucket;
+  if(c){const[k,i]=c.split(":");const p=V(k,{});if(p[i]){delete p[i];setV(k,p)}else setV(k+"sel",V(k+"sel",null)===+i?null:+i);redraw(k);return}
+  if(b){const[k,bk]=b.split(":");const s=V(k+"sel",null);if(s===null)return;const p=V(k,{});p[s]=bk;setV(k,p);setV(k+"sel",null);redraw(k)}
+});
+function redraw(k){if(k==="s2")rerender("sort2",()=>sortRender("s2",SORT2,[["pro","Pros 👍"],["con","Cons 👎"]]));else rerender("sort4",()=>sortRender("s4",SORT4,[["pro","Pros"],["con","Cons"],["str","Structure"]]))}
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.dataset&&e.target.dataset.bucket){e.preventDefault();e.target.click()}});
+document.addEventListener("change",e=>{const t=e.target;if(t.matches("select[data-k]")){setV(t.dataset.k,t.value)}else if(t.matches("input[type=checkbox][data-k]")){setV(t.dataset.k,t.checked)}});
+document.addEventListener("input",e=>{const t=e.target;if(t.matches("input.gap")||t.matches("input[type=text][data-k]")){setV(t.dataset.k,t.value)}else if(t.dataset.text){setV(t.dataset.text,t.value);wc()}});
+function wc(){const x=$("#wc");if(x){const n=(V("ftext","").trim().match(/\S+/g)||[]).length;x.textContent=n+" words"}}
+window.addEventListener("hashchange",()=>{const id=location.hash.slice(1);if(id&&R[id])open(id);else if(!id)home()});
+(function init(){const id=location.hash.slice(1);if(id&&R[id])open(id);else home();progress()})();
+</script>
+</body>
+</html>
