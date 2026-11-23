@@ -102,6 +102,26 @@ textarea{width:100%;min-height:150px;line-height:1.6}
 .pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
 .pair div{background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 14px;font-size:15px;border:2px solid var(--line)}
 .pair b{color:var(--leaf-d)}
+/* scoring */
+.sp{background:rgba(255,216,77,.16);border:1px solid #FFD84D;color:#FFE98A;border-radius:999px;padding:2px 11px;font-weight:700;font-size:14px;white-space:nowrap}
+.tm{float:right;font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:0;text-transform:none;color:var(--leaf-d);background:#fff;border:2px solid var(--line);border-radius:999px;padding:1px 12px;font-size:15px}
+.board{display:flex;gap:16px;align-items:center;background:#fff;border:3px solid var(--sun);border-radius:16px;padding:14px 18px;margin:0 0 22px;box-shadow:0 4px 14px rgba(11,61,46,.12)}
+.board .rk{font-size:56px;line-height:1;flex:none}
+.board .bd{flex:1;min-width:0}
+.board .rn{font-family:var(--f-display);font-size:26px;color:var(--bg2);line-height:1.1;margin-bottom:6px}
+.board .nb{height:12px;border-radius:7px;background:var(--line);overflow:hidden}
+.board .nb i{display:block;height:100%;background:linear-gradient(90deg,var(--lime),var(--sun));transition:width .6s}
+.board .pts{font-size:14px;color:var(--muted);margin-top:5px}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.badge{font-size:13px;font-weight:700;border-radius:999px;padding:2px 10px;background:#EEF3EF;color:#8AA196;border:2px dashed #C9D8CE;filter:grayscale(1);opacity:.75}
+.badge.on{background:var(--key-soft);color:var(--key);border:2px solid var(--sun);filter:none;opacity:1}
+.stars{color:#E8A400;letter-spacing:1px}
+details.rules{background:#fff;border:2px solid var(--line);border-radius:10px;padding:8px 14px;margin:0 0 22px;font-size:15px}
+details.rules summary{cursor:pointer;font-weight:700;color:var(--leaf-d)}
+details.rules ul{margin:8px 0 2px;padding-left:20px}
+.ord .chip.sel{outline:4px solid var(--sun);outline-offset:1px;background:var(--key-soft)}
+.ord .chip{cursor:pointer}
+@media(max-width:560px){.bar{display:none}.board{flex-direction:column;align-items:flex-start}}
 /* scene motion */
 .sway{transform-box:fill-box;transform-origin:50% 100%;animation:sway 4s ease-in-out infinite alternate}
 .sway.s2{animation-duration:5.2s;animation-delay:-1.5s}
@@ -118,13 +138,14 @@ textarea{width:100%;min-height:150px;line-height:1.6}
 </head>
 <body>
 <div class="leaves" aria-hidden="true"></div>
-<header class="top"><div class="top-in"><div class="brand">The Green Way<small>Unit 2 · Topic 1 · pp. 36–38</small></div><div class="prog"><span id="hp"></span><span id="pt">0 / 7</span><div class="bar"><i id="pb" style="width:0%"></i></div></div></div></header>
+<header class="top"><div class="top-in"><div class="brand">The Green Way<small>Unit 2 · Topic 1 · pp. 36–38</small></div><div class="prog"><span id="hp"></span><span id="pt">0 / 7</span><span class="sp" id="sp">0 pts</span><div class="bar"><i id="pb" style="width:0%"></i></div></div></div></header>
 <main id="app"></main>
 <script>
 "use strict";
 const KEY="cs-english10-u2t1-v1";
 let S={done:{},v:{},stat:{}};
 try{S=Object.assign(S,JSON.parse(localStorage.getItem(KEY)||"null")||{})}catch(e){}
+S.time=S.time||{};S.pts=S.pts||{};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -227,26 +248,56 @@ const stations=[
 {id:"cert",t:"My certificate",s:"Create a PDF with your results to upload",m:"≈ 3 min · results",cert:true}];
 const work=()=>stations.filter(s=>!s.cert);
 const doneCount=()=>work().filter(s=>S.done[s.id]).length;
-function progress(){const n=doneCount();$("#hp").innerHTML=`<span class="hplant" style="display:inline-block">${plant(n)}</span>`;$("#pt").textContent=n+" / "+work().length;$("#pb").style.width=(n/work().length*100)+"%"}
+/* ---------- scoring ---------- */
+const TARGET={read:480,proscons:480,words:360,structure:540,future:540};
+const RANKS=[[0,"Seedling","🌱"],[400,"Sprout","🌿"],[800,"Young tree","🌳"],[1200,"Eco hero","⚡"],[1500,"Green legend","🏆"]];
+const MAXP=1600;
+const LINKS=["moreover","however","on the other hand","on the one hand","in summary","in conclusion","a great advantage","one serious problem","the main benefit","the biggest disadvantage","in addition","therefore","although","for example"];
+const ptsOf=p=>p?(p.base||0)+(p.speed||0)+(p.lang||0)+(p.len||0):0;
+const totalPts=()=>work().reduce((a,s)=>a+(S.done[s.id]?ptsOf(S.pts[s.id]):0),0);
+const totalTime=()=>work().reduce((a,s)=>a+(S.time[s.id]||0),0);
+const rankIdx=p=>{let r=0;RANKS.forEach((x,i)=>{if(p>=x[0])r=i});return r};
+const fmtT=n=>String(Math.floor(n/60)).padStart(2,"0")+":"+String(n%60).padStart(2,"0");
+const starStr=n=>"★".repeat(n)+"☆".repeat(3-n);
+function langInfo(){const t=V("ftext","").toLowerCase().replace(/[’`]/g,"'");const found=LINKS.filter(l=>t.includes(l));const fut=(t.match(/\bwill\b|won't|\bgoing to\b|\b\w+'ll\b/g)||[]).length;return{found,fut,pts:Math.min(5,found.length)*8+(fut>=2?10:0)}}
+function award(id){
+  const z=S.stat[id]||{checks:1},c=z.checks,tm=S.time[id]||0;let p={checks:c,time:tm,base:0,speed:0,lang:0,len:0,stars:0},extra="";
+  if(id==="talk")p.base=100;
+  else if(id==="final"){const w=(V("ftext","").trim().match(/\S+/g)||[]).length,L=langInfo();p.base=150;p.len=Math.min(50,Math.max(0,w-80));p.lang=L.pts;p.words=w;p.found=L.found;
+    extra=`<br><small>Text 150 · length bonus ${p.len} · language bonus ${p.lang}</small><br><small>Linking phrases found: ${L.found.length?esc(L.found.join(", ")):"none"} · future forms: ${L.fut}</small>`}
+  else{p.base=Math.max(50,200-50*(c-1));const T=TARGET[id];p.speed=Math.round(50*Math.max(0,Math.min(1,(2*T-tm)/T)));p.stars=c<=1?3:c<=3?2:1;
+    extra=`<br><small>Accuracy ${p.base} (${c} check${c>1?"s":""}) · speed bonus ${p.speed} (${fmtT(tm)})</small>`}
+  S.pts[id]=p;
+  return `<br><b>+${ptsOf(p)} points</b> ${p.stars?`<span class="stars">${starStr(p.stars)}</span>`:""}`+extra;
+}
+function badges(){const P=work().filter(s=>S.done[s.id]).map(s=>S.pts[s.id]||{}),f=S.pts.final||{};
+  return [["Sharpshooter","3 stations solved at the first check",P.filter(q=>q.stars===3).length>=3,"🎯"],["Quick thinker","speed bonus of 40 or more on 3 stations",P.filter(q=>q.speed>=40).length>=3,"⚡"],["Link master","4 different linking phrases in your final text",!!S.done.final&&(f.found||[]).length>=4,"🔗"],["Wordsmith","120 words or more in the final text",!!S.done.final&&(f.words||0)>=120,"✍️"],["Full path","all 7 stations finished",doneCount()===work().length,"🌳"]]}
+function board(){const p=totalPts(),ri=rankIdx(p),r=RANKS[ri],nx=RANKS[ri+1],pct=nx?Math.round((p-r[0])/(nx[0]-r[0])*100):100;
+  return `<div class="board"><div class="rk" aria-hidden="true">${r[2]}</div><div class="bd"><div class="rn">${r[1]} · ${p} pts</div><div class="nb" role="img" aria-label="Progress to the next rank"><i style="width:${pct}%"></i></div><div class="pts">${nx?(nx[0]-p)+" pts to the next rank: "+nx[1]:"Top rank reached!"} · ⏱ ${fmtT(totalTime())} · max. ${MAXP} pts</div><div class="badges">${badges().map(b=>`<span class="badge ${b[2]?"on":""}">${b[3]} ${b[0]}</span>`).join("")}</div></div></div>
+<details class="rules"><summary>How do I earn points?</summary><ul><li><b>Stations 1–5:</b> up to 200 accuracy points. Solve it at the first check for 200; every extra check costs 50 points (minimum 50).</li><li><b>Speed bonus:</b> up to 50 points for a fast time. Your timer runs while a station is open.</li><li><b>Stars:</b> ★★★ = first check · ★★ = two or three checks · ★ = more.</li><li><b>Talk:</b> 100 points. <b>Final task:</b> 150 points + up to 50 for length (words above 80) + up to 50 for linking phrases and future forms.</li><li><b>Badges:</b> collect all five!</li></ul></details>`}
+let curSt=null;
+setInterval(()=>{if(curSt&&!document.hidden&&!S.done[curSt]){S.time[curSt]=(S.time[curSt]||0)+1;const e=$("#tm");if(e)e.textContent="⏱ "+fmtT(S.time[curSt]);if(S.time[curSt]%5===0)save()}},1000);
+function doneLabel(id){const p=S.pts[id];return p?`Done ✓ · ${p.stars?`<span class="stars">${starStr(p.stars)}</span> · `:""}${ptsOf(p)} pts`:"Done ✓"}
+function progress(){const n=doneCount();$("#sp").textContent=totalPts()+" pts";$("#hp").innerHTML=`<span class="hplant" style="display:inline-block">${plant(n)}</span>`;$("#pt").textContent=n+" / "+work().length;$("#pb").style.width=(n/work().length*100)+"%"}
 
 function home(){
-  history.replaceState(null,"",location.pathname+location.search);
+  history.replaceState(null,"",location.pathname+location.search);curSt=null;
   $("#app").innerHTML=`${scene()}<div class="eyebrow">Unit 2 · Topic 1 · Student book pp. 36–38</div><h1>The Green Way</h1>
   <p class="lead">Can plants on a motorway really clean the air of a big city? Work through six stations, write your own text and create your certificate.</p>
   <div class="goal">By the end you can describe the pros and cons of a technological development.</div>
-  <div class="how"><div><b>Order</b>Do the stations in the order you like. Do the final task last.</div><div><b>Help</b>Use the hints, then check. You can try again as often as you like.</div><div><b>Material</b>Keep your student book open at pp. 36–38.</div></div>
-  <ol class="route">${stations.map((s,i)=>`<li class="stop ${S.done[s.id]?"done":""} ${s.final||s.cert?"final":""}"><span class="num">${s.cert?"★":S.done[s.id]?plant(4):i+1}</span><button class="card" type="button" data-go="${s.id}"><span class="t">${esc(s.t)}</span><span class="s">${esc(s.s)}</span><span class="m">${S.done[s.id]&&!s.cert?"Done ✓":esc(s.m)}</span></button></li>`).join("")}</ol>
+  <div class="how"><div><b>Order</b>Do the stations in the order you like. Do the final task last.</div><div><b>Score</b>Fewer checks and a faster time give more points. Who becomes the Green Legend?</div><div><b>Material</b>Keep your student book open at pp. 36–38.</div></div>
+  ${board()}<ol class="route">${stations.map((s,i)=>`<li class="stop ${S.done[s.id]?"done":""} ${s.final||s.cert?"final":""}"><span class="num">${s.cert?"★":S.done[s.id]?plant(4):i+1}</span><button class="card" type="button" data-go="${s.id}"><span class="t">${esc(s.t)}</span><span class="s">${esc(s.s)}</span><span class="m">${S.done[s.id]&&!s.cert?doneLabel(s.id):esc(s.m)}</span></button></li>`).join("")}</ol>
   <div class="row"><button class="btn ghost" type="button" data-act="reset">Start again</button></div>`;
   progress();window.scrollTo(0,0);
 }
 function open(id){
-  const st=stations.find(s=>s.id===id);history.replaceState(null,"","#"+id);
-  $("#app").innerHTML=`<button class="back" type="button" data-act="home">← Back to the map</button><div class="eyebrow">${st.cert?"Last step":"Station "+(stations.indexOf(st)+1)+" of "+work().length}</div><h2>${esc(st.t)}</h2>${miniScene()}<div id="st">${R[id]()}</div>`;
+  const st=stations.find(s=>s.id===id);history.replaceState(null,"","#"+id);curSt=st.cert?null:id;
+  $("#app").innerHTML=`<button class="back" type="button" data-act="home">← Back to the map</button><div class="eyebrow">${st.cert?"Last step":"Station "+(stations.indexOf(st)+1)+" of "+work().length}${st.cert?"":`<span class="tm" id="tm" title="Time on this station">⏱ ${fmtT(S.time[id]||0)}</span>`}</div><h2>${esc(st.t)}</h2>${miniScene()}<div id="st">${R[id]()}</div>`;
   window.scrollTo(0,0);wc();
 }
-function finish(id,ok,msg){
+function finish(id,ok,msg,extra){
   const r=$("#res");if(!r)return;
-  r.className="result"+(ok?" win":"");r.style.color="";r.innerHTML=(ok?`<span class="pl">${plant(7)}</span>`:"")+`<span>${esc(msg)}</span>`;
+  r.className="result"+(ok?" win":"");r.style.color="";r.innerHTML=(ok?`<span class="pl">${plant(7)}</span>`:"")+`<span>${esc(msg)}${extra||""}</span>`;
   if(ok&&!S.done[id]){S.done[id]=1;save();progress()}
 }
 const chk=(id)=>`<div class="row"><button class="btn" type="button" data-act="check" data-st="${id}">Check</button></div><div id="res" class="result" role="status"></div>`;
@@ -282,10 +333,10 @@ const WANS=["sustainable","claim","sky-high","justify","in favour of","moreover"
 /* 4 structure */
 R.structure=()=>`<h3>A · Sort the phrases</h3><p>Which phrases introduce a <b>pro</b>, which a <b>con</b>, and which only <b>structure</b> your text?</p>
 <div id="sort4">${sortRender("s4",SORT4,[["pro","Pros"],["con","Cons"],["str","Structure"]])}</div>
-<h3>B · Put the text in the right order</h3><p>These sentences form a short pros-and-cons paragraph about ‘smart homes’. Use the arrows.</p>
+<h3>B · Put the text in the right order</h3><p>These sentences form a short pros-and-cons paragraph about ‘smart homes’. Tap a sentence, then tap the sentence it should swap places with. You can also use the arrows.</p>
 <div id="ord">${ordRender()}</div>${chk("structure")}`;
 function ordArr(){let o=V("ord",null);if(!o){o=[3,0,5,2,4,1];}return o}
-function ordRender(){return ordArr().map((n,pos)=>`<div class="ord"><button class="chip" type="button" style="cursor:default" data-n="${n}">${esc(ORDER[n])}</button><div class="ar"><button type="button" data-mv="${pos}:-1" aria-label="move up">▲</button><button type="button" data-mv="${pos}:1" aria-label="move down">▼</button></div></div>`).join("")}
+function ordRender(){return ordArr().map((n,pos)=>`<div class="ord"><button class="chip ${V("ordsel",null)===pos?"sel":""}" type="button" data-ochip="${pos}" data-n="${n}">${esc(ORDER[n])}</button><div class="ar"><button type="button" data-mv="${pos}:-1" aria-label="move up">▲</button><button type="button" data-mv="${pos}:1" aria-label="move down">▼</button></div></div>`).join("")}
 /* 5 future */
 R.future=()=>`<h3>A · Which form is best?</h3>
 ${FA.map((f,i)=>{const p=f[0].split("___");return `<div class="item" data-i="${i}"><p class="q"><b>${i+1}</b>${esc(p[0])}<select data-k="fa${i}"><option value="">…</option>${f[1].map((o,j)=>`<option value="${j}" ${V("fa"+i)===String(j)?"selected":""}>${esc(o)}</option>`).join("")}</select>${esc(p[1]||"")}</p><p class="fb"></p></div>`}).join("")}
@@ -309,12 +360,33 @@ R.final=()=>{const t=V("ftopic","a");return `<p>Write a short text for your scho
 <div class="row"><button class="btn" type="button" data-act="copy">Copy my text</button><button class="btn light" type="button" data-act="dl">Download as .txt</button><button class="btn" type="button" data-act="check" data-st="final" style="background:var(--ok);border-color:var(--ok)">I have finished</button></div><div id="res" class="result" role="status"></div>`};
 
 
-R.cert=()=>`<p>Fill in your name. The certificate shows which stations you have finished and includes your final text. <b>Download the PDF and upload it</b> where your teacher asks you to (for example in the class folder).</p>
+R.cert=()=>`${board()}<p>Fill in your name. The certificate shows your points, the stations you have finished, your final text and a record of all your answers. <b>Download the PDF and upload it</b> where your teacher asks you to (for example in the class folder).</p>
 <div class="paper"><label style="display:block;font-weight:700;margin-bottom:6px" for="cname">Your name</label><input id="cname" type="text" data-k="cname" style="width:100%;margin-bottom:12px" autocomplete="name" value="${esc(V("cname",""))}"><label style="display:block;font-weight:700;margin-bottom:6px" for="cclass">Class</label><input id="cclass" type="text" data-k="cclass" style="width:100%" value="${esc(V("cclass",""))}" placeholder="e.g. 10a"></div>
 <div class="row"><button class="btn" type="button" data-act="mkcert">Create my certificate</button><button class="btn light" type="button" data-act="dlpdf" id="dlpdf" hidden>Download PDF</button></div>
-<div id="cres" class="result" role="status"></div><div id="cprev"></div>`;
+<div id="cres" class="result" role="status"></div><div id="ccode"></div><div id="cprev"></div>`;
 function stationStatus(s){const z=(S.stat||{})[s.id]||{};if(!S.done[s.id])return["open","Not finished yet"];return["ok",z.checks<=1?"Solved at the first check":"Solved after "+z.checks+" checks"]}
 function wrap(ctx,text,max){const out=[];text.split(/\n/).forEach(par=>{let line="";par.split(/\s+/).filter(Boolean).forEach(w=>{const t=line?line+" "+w:w;if(ctx.measureText(t).width>max&&line){out.push(line);line=w}else line=t});out.push(line)});return out}
+const ANSL={T:"true",F:"false",N:"not in the text"};
+function fnv(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0}return h.toString(36)}
+function scoreCode(){
+  const f=S.pts.final||{};
+  const j=JSON.stringify({n:V("cname","").trim().slice(0,30),c:V("cclass","").trim().slice(0,8),s:totalPts(),t:totalTime(),d:doneCount(),k:work().reduce((a,q)=>a+((S.pts[q.id]||{}).stars||0),0),w:f.words||0});
+  const b=btoa(unescape(encodeURIComponent(j))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+  return "GW1."+b+"."+fnv(b+"gw-u2t1-salt");
+}
+function record(){
+  const sec=[],tag=id=>S.done[id]?"":" (not solved yet)";
+  const lst=(p,items,b)=>items.filter((x,i)=>p[i]===b).map(x=>x[0]).join(" / ")||"–";
+  sec.push(["1 · Read & check"+tag("read"),READ.map((r,i)=>(i+1)+" "+(ANSL[V("read"+i)]||"–")).join("  ·  ")]);
+  const p2=V("s2",{});
+  sec.push(["2 · Pros & cons"+tag("proscons"),"Pros: "+lst(p2,SORT2,"pro"),"Cons: "+lst(p2,SORT2,"con"),"Most important point: "+({a:"The plants make the motorway look nicer.",b:"The scheme has not reduced the number of cars, so pollution is still a problem.",c:"The plants need too much water."}[V("s2q")]||"–"),"My opinion: "+(V("s2opinion","").trim()||"–")]);
+  sec.push(["3 · Key words"+tag("words"),WANS.map((_,i)=>(i+1)+" "+(V("w"+i)||"–")).join("  ·  ")]);
+  const p4=V("s4",{});
+  sec.push(["4 · Structure"+tag("structure"),"Pros: "+lst(p4,SORT4,"pro"),"Cons: "+lst(p4,SORT4,"con"),"Structure: "+lst(p4,SORT4,"str"),"My order of the model paragraph (sentence numbers): "+ordArr().map(n=>n+1).join(" – ")]);
+  sec.push(["5 · Talking about the future"+tag("future"),"A: "+FA.map((f,i)=>(i+1)+" "+(V("fa"+i)===undefined||V("fa"+i)===""?"–":f[1][+V("fa"+i)])).join("  ·  "),"B: "+DLG.map((d,i)=>d[1]?"("+d[1].match(/\d+/)[0]+") "+(V("d"+i,"").trim()||"–"):null).filter(Boolean).join("  ·  ")]);
+  sec.push(["6 · Talk about it"+tag("talk"),"Self-check boxes ticked: "+[0,1,2].filter(i=>V("tk"+i)).length+" of 3"]);
+  return sec;
+}
 function drawCert(){
   const W=1654,H=2339,pages=[];const mk=()=>{const c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,W,H);return[c,x]};
   const F='"Atkinson Hyperlegible","Segoe UI",Arial,sans-serif',D='"Saira Stencil One",Impact,Arial,sans-serif';
@@ -323,7 +395,6 @@ function drawCert(){
   x.fillStyle="#FFD84D";x.font="700 30px "+F;x.fillText("UNIT 2 · TOPIC 1 · STUDENT BOOK PP. 36–38",90,110);
   x.fillStyle="#fff";x.font="96px "+D;x.fillText("The Green Way",90,215);
   x.font="700 40px "+F;x.fillStyle="#A8C6CC";x.fillText("Learning path certificate",90,282);
-  // seal
   x.beginPath();x.arc(1450,170,100,0,7);x.fillStyle="#FFD84D";x.fill();x.lineWidth=8;x.strokeStyle="#fff";x.stroke();
   x.beginPath();x.moveTo(1405,170);x.lineTo(1440,208);x.lineTo(1500,128);x.lineWidth=18;x.lineCap="round";x.lineJoin="round";x.strokeStyle="#0B3D2E";x.stroke();
   const name=V("cname","").trim()||"(no name)",cl=V("cclass","").trim(),d=new Date();
@@ -331,25 +402,38 @@ function drawCert(){
   x.fillStyle="#14262E";x.font="700 30px "+F;x.fillText("NAME",90,430);x.fillText("CLASS",900,430);x.fillText("DATE",1310,430);
   x.font="54px "+F;x.fillText(name.slice(0,26),90,495);x.fillText(cl.slice(0,8)||"–",900,495);x.font="44px "+F;x.fillText(ds,1310,492);
   x.fillStyle="#C3D1D0";x.fillRect(90,515,1474,3);
-  const n=doneCount(),tot=work().length;
+  const n=doneCount(),tot=work().length,pts=totalPts(),ri=rankIdx(pts);
   x.fillStyle="#14262E";x.font="700 40px "+F;x.fillText("Stations finished: "+n+" of "+tot,90,610);
   x.fillStyle="#E3ECEA";x.fillRect(90,635,1474,34);x.fillStyle="#2E9E5B";x.fillRect(90,635,1474*n/tot,34);
-  let y=760;
-  work().forEach((s,i)=>{const[st,txt]=stationStatus(s);
+  const box=(bx,bw,label,val)=>{x.fillStyle="#EAF6EC";x.fillRect(bx,710,bw,130);x.fillStyle="#4E6268";x.font="700 26px "+F;x.fillText(label,bx+24,752);x.fillStyle="#0B3D2E";x.font="700 54px "+F;x.fillText(val,bx+24,818)};
+  box(90,470,"POINTS",pts+" / "+MAXP);box(580,520,"RANK",RANKS[ri][1]);box(1120,444,"TOTAL TIME",fmtT(totalTime()));
+  let y=930;
+  work().forEach((s,i)=>{const[st,txt]=stationStatus(s),p=S.pts[s.id];
     x.beginPath();x.arc(135,y-16,34,0,7);x.fillStyle=st==="open"?"#E3ECEA":"#2E9E5B";x.fill();
     x.fillStyle=st==="open"?"#4E6268":"#fff";x.font="700 38px "+F;x.textAlign="center";x.fillText(st==="open"?String(i+1):"✓",135,y-3);x.textAlign="left";
     x.fillStyle="#14262E";x.font="700 42px "+F;x.fillText(s.t,205,y-4);
-    x.fillStyle="#4E6268";x.font="34px "+F;x.fillText(txt,205,y+38);
-    x.fillStyle="#E3ECEA";x.fillRect(205,y+62,1359,2);y+=118});
-  y+=20;x.fillStyle="#0B3D2E";x.font="700 44px "+F;x.fillText("My final text",90,y);
-  const t=V("ftext","").trim();x.font="36px "+F;x.fillStyle="#14262E";
-  const lines=t?wrap(x,t,1470):["(no text written yet)"];
-  const wc=(t.match(/\S+/g)||[]).length;
-  x.fillStyle="#4E6268";x.font="30px "+F;x.fillText(wc+" words · topic: "+TOPICS[V("ftopic","a")][0],90,y+44);
-  let ly=y+100;const lh=54;let cx=x;
-  const foot=(ctx,pg,np)=>{ctx.fillStyle="#9AA5AE";ctx.font="28px "+F;ctx.fillText("Capybarastudy · English 10 · Red Line 6 · created on my device",90,H-70);ctx.textAlign="right";ctx.fillText("Page "+pg+" / "+np,W-90,H-70);ctx.textAlign="left"};
-  const out=[];let pg=0;
-  lines.forEach(l=>{if(ly>H-170){out.push(cx);[c,cx]=mk();pages.push(c);ly=140}cx.fillStyle="#14262E";cx.font="36px "+F;cx.fillText(l,90,ly);ly+=lh});
+    x.fillStyle="#4E6268";x.font="34px "+F;x.fillText(txt+(S.done[s.id]?" · "+fmtT(S.time[s.id]||0):""),205,y+38);
+    if(st!=="open"&&p){x.textAlign="right";x.fillStyle="#14262E";x.font="700 40px "+F;x.fillText(ptsOf(p)+" pts",1564,y-4);if(p.stars){x.fillStyle="#E8A400";x.font="36px "+F;x.fillText(starStr(p.stars),1564,y+38)}x.textAlign="left"}
+    x.fillStyle="#E3ECEA";x.fillRect(205,y+58,1359,2);y+=104});
+  let cx=x,cy=y+10;
+  const np=()=>{const m=mk();c=m[0];cx=m[1];pages.push(c);cy=130};
+  const need=h=>{if(cy+h>H-130)np()};
+  const line=(t,font,col,lh,ind)=>{ind=ind||90;cx.font=font;wrap(cx,t,W-90-ind).forEach(l=>{need(lh);cx.font=font;cx.fillStyle=col;cx.fillText(l,ind,cy);cy+=lh})};
+  const h1=t=>{need(140);cy+=30;cx.fillStyle="#0B3D2E";cx.font="700 44px "+F;cx.fillText(t,90,cy);cy+=14;cx.fillStyle="#C3D1D0";cx.fillRect(90,cy,1474,3);cy+=48};
+  const h2=t=>{need(120);cy+=14;cx.fillStyle="#1B7F4B";cx.font="700 36px "+F;cx.fillText(t,90,cy);cy+=48};
+  const bd=badges().filter(b=>b[2]).map(b=>b[0]);
+  line("Badges: "+(bd.join(" · ")||"none yet"),"700 34px "+F,"#14262E",50);
+  h1("My final text");
+  const t=V("ftext","").trim(),wcn=(t.match(/\S+/g)||[]).length;
+  line(wcn+" words · topic: "+TOPICS[V("ftopic","a")][0],"30px "+F,"#4E6268",46);cy+=8;
+  line(t||"(no text written yet)","36px "+F,"#14262E",54);
+  h1("Answer record (backup copy of my answers)");
+  line("These are the answers I entered on my device. Correct answers are shown for every solved station.","30px "+F,"#4E6268",44);
+  record().forEach(sec=>{h2(sec[0]);sec.slice(1).forEach(tx=>line(tx,"32px "+F,"#14262E",46))});
+  h1("Class code");
+  line("Your teacher can use this code for the class ranking:","30px "+F,"#4E6268",44);
+  const code=scoreCode();for(let i=0;i<code.length;i+=72)line(code.slice(i,i+72),"26px monospace","#14262E",36);
+  const foot=(ctx,pg,np2)=>{ctx.fillStyle="#9AA5AE";ctx.font="28px "+F;ctx.fillText("Capybarastudy · English 10 · Red Line 6 · created on my device",90,H-70);ctx.textAlign="right";ctx.fillText("Page "+pg+" / "+np2,W-90,H-70);ctx.textAlign="left"};
   pages.forEach((p,i)=>foot(p.getContext("2d"),i+1,pages.length));
   return pages;
 }
@@ -374,6 +458,7 @@ function mkcert(){
   const pages=drawCert();lastPdf=buildPdf(pages);
   $("#cprev").innerHTML=pages.map(p=>`<img alt="Certificate preview" style="width:100%;max-width:560px;border-radius:8px;margin:10px 10px 0 0;background:#fff" src="${p.toDataURL("image/jpeg",.8)}">`).join("");
   $("#dlpdf").hidden=false;
+  $("#ccode").innerHTML=`<div class="paper"><label style="display:block;font-weight:700;margin-bottom:6px" for="codebox">Your class code</label><input id="codebox" readonly style="width:100%;font-family:monospace;font-size:14px" value="${scoreCode()}"><div class="row" style="margin-top:10px"><button class="btn light" type="button" data-act="copycode">Copy code</button></div></div>`;
   $("#cres").textContent="Your certificate is ready. Download the PDF and upload it.";$("#cres").style.color="#8FE3B5";
 }
 
@@ -405,15 +490,17 @@ document.addEventListener("click",e=>{
   if(t.dataset.go)return open(t.dataset.go);
   const a=t.dataset.act;
   if(a==="home")return home();
-  if(a==="reset"){if(confirm("Delete all progress on this device?")){S={done:{},v:{},stat:{}};save();home()}return}
-  if(a==="check"){const id=t.dataset.st;const ok=C[id]();const st=(S.stat=S.stat||{});const z=st[id]=st[id]||{checks:0};z.checks++;if(ok)z.ok=1;save();finish(id,ok,MSG[id][ok?0:1]);return}
+  if(a==="reset"){if(confirm("Delete all progress on this device?")){S={done:{},v:{},stat:{},time:{},pts:{}};save();home()}return}
+  if(a==="check"){const id=t.dataset.st;const ok=C[id]();const st=(S.stat=S.stat||{});const z=st[id]=st[id]||{checks:0};z.checks++;if(ok)z.ok=1;let extra="";if(ok&&!S.done[id])extra=award(id);else if(!ok&&TARGET[id])extra=" Points if you solve it at your next check: "+Math.max(50,200-50*z.checks)+".";save();finish(id,ok,MSG[id][ok?0:1],extra);return}
   if(a==="mkcert"){mkcert();return}
+  if(a==="copycode"){const b=$("#codebox");b.select();(navigator.clipboard?navigator.clipboard.writeText(b.value):Promise.reject()).then(()=>{$("#cres").textContent="Code copied."},()=>{$("#cres").textContent="Select the code and copy it."});return}
   if(a==="dlpdf"){if(!lastPdf)mkcert();const l=document.createElement("a");l.href=URL.createObjectURL(lastPdf);const n=(V("cname","").trim()||"certificate").replace(/[^\w\-äöüÄÖÜß]+/g,"_");l.download="GreenWay_"+n+".pdf";document.body.appendChild(l);l.click();l.remove();return}
   if(a==="next"){const cur=V("card",TALK[0]);let n;do{n=TALK[Math.floor(Math.random()*TALK.length)]}while(n===cur);setV("card",n);$("#card").textContent=n;return}
   if(a==="copy"){const x=V("ftext","");(navigator.clipboard?navigator.clipboard.writeText(x):Promise.reject()).then(()=>finish("final",false,"Copied!"),()=>{$("[data-text=ftext]").select();finish("final",false,"Select the text and copy it.")});return}
   if(a==="dl"){const b=new Blob([V("ftext","")],{type:"text/plain"});const l=document.createElement("a");l.href=URL.createObjectURL(b);l.download="my-text.txt";l.click();return}
   if(t.dataset.k&&t.dataset.val){setV(t.dataset.k,t.dataset.val);$$("[data-k="+t.dataset.k+"]").forEach(b=>b.setAttribute("aria-pressed",b===t));return}
   if(t.dataset.topic){setV("ftopic",t.dataset.topic);rerender("st",R.final);wc();return}
+  if(t.dataset.ochip){const q=+t.dataset.ochip,sel=V("ordsel",null);if(sel===null)setV("ordsel",q);else{if(sel!==q){const o=ordArr().slice();[o[sel],o[q]]=[o[q],o[sel]];setV("ord",o)}setV("ordsel",null)}rerender("ord",ordRender);return}
   if(t.dataset.mv){const[p,d]=t.dataset.mv.split(":").map(Number);const o=ordArr().slice(),q=p+d;if(q<0||q>=o.length)return;[o[p],o[q]]=[o[q],o[p]];setV("ord",o);rerender("ord",ordRender);return}
   const c=t.dataset.chip,b=t.dataset.bucket;
   if(c){const[k,i]=c.split(":");const p=V(k,{});if(p[i]){delete p[i];setV(k,p)}else setV(k+"sel",V(k+"sel",null)===+i?null:+i);redraw(k);return}
