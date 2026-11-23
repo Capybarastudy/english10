@@ -7,89 +7,118 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Stencil+One&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
-/* Layout: sticky header with progress; a route map of six stations plus a final task; one station is open at a time. */
-:root{--bg:#0E3B4F;--bg2:#08283A;--on-bg:#F2F7F7;--on-bg-muted:#A8C6CC;--surface:#FBFAF6;--surface-2:#E3ECEA;--ink:#14262E;--muted:#4E6268;--line:#C3D1D0;--sea:#0F8B8D;--coral:#F0745A;--sun:#FFC845;--ok:#24965E;--ok-soft:#D4F0E0;--bad:#C8412F;--bad-soft:#FBDCD7;--key:#B8650A;--key-soft:#FFF0CC;
---f-display:"Saira Stencil One","Impact","Arial Narrow",sans-serif;--f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;color-scheme:dark}
+/* Layout: sticky header with a plant that grows with progress; an animated eco-city scene above the route map; one station open at a time.
+   Light green theme: mint background, white cards, deep-green header. All motion respects prefers-reduced-motion. */
+:root{--bg:#E4F6E6;--bg2:#0B3D2E;--ink:#12362A;--muted:#47705D;--line:#BFDCC8;--surface:#FFFFFF;--leaf:#2E9E5B;--leaf-d:#1B7F4B;--lime:#A8E05F;--sun:#FFD84D;--coral:#F0745A;--ok:#24965E;--ok-soft:#D4F0E0;--bad:#C8412F;--bad-soft:#FBDCD7;--key:#8A5A00;--key-soft:#FFF3C4;
+--f-display:"Saira Stencil One","Impact","Arial Narrow",sans-serif;--f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;color-scheme:light}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;-webkit-text-size-adjust:100%;background:radial-gradient(ellipse at 50% -10%,#1C6B80 0%,var(--bg) 45%,var(--bg2) 100%) fixed var(--bg);color:var(--on-bg);font-family:var(--f-body);font-size:17px;line-height:1.55}
+body{margin:0;-webkit-text-size-adjust:100%;background:linear-gradient(180deg,#CFF0D8 0,#E9F8E4 38%,#F6FBEA 100%) fixed var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55;position:relative}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg2)}
 button,input,textarea,select{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg2);border-bottom:3px solid var(--ok)}
-.top-in{max-width:900px;margin:0 auto;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:center;gap:14px}
+:focus-visible{outline:3px solid var(--leaf-d);outline-offset:2px}
+.leaves{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.leaves i{position:absolute;top:-30px;width:18px;height:18px;border-radius:0 80% 0 80%;background:var(--leaf);opacity:.22;animation:fall linear infinite}
+@keyframes fall{0%{transform:translate(0,-30px) rotate(0)}50%{transform:translate(40px,55vh) rotate(180deg)}100%{transform:translate(-20px,110vh) rotate(360deg)}}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg2);color:#fff;border-bottom:4px solid var(--lime)}
+.top-in{max-width:900px;margin:0 auto;padding-block:6px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:center;gap:14px}
 .brand{font-family:var(--f-display);font-size:22px;line-height:1;margin-right:auto}
-.brand small{display:block;font-family:var(--f-body);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--on-bg-muted);margin-top:3px}
-.prog{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--on-bg-muted)}
-.bar{width:130px;height:10px;border-radius:6px;background:rgba(255,255,255,.15);overflow:hidden}
-.bar i{display:block;height:100%;background:var(--sun);transition:width .3s}
-main{max-width:900px;margin:0 auto;padding-block:26px 70px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--sun);font-weight:700}
-h1{font-family:var(--f-display);font-weight:400;font-size:clamp(38px,7vw,62px);line-height:1;margin:6px 0 12px;text-wrap:balance}
-h2{font-family:var(--f-display);font-weight:400;font-size:clamp(26px,4.5vw,38px);line-height:1.05;margin:4px 0 10px;text-wrap:balance}
-h3{font-size:18px;margin:18px 0 8px}
+.brand small{display:block;font-family:var(--f-body);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#A9D8BC;margin-top:3px}
+.prog{display:flex;align-items:center;gap:10px;font-size:14px;color:#CDEBD7}
+.bar{width:110px;height:10px;border-radius:6px;background:rgba(255,255,255,.18);overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--lime),var(--sun));transition:width .5s}
+.hplant{width:38px;height:50px;flex:none}
+main{position:relative;z-index:1;max-width:900px;margin:0 auto;padding-block:20px 70px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--leaf-d);font-weight:700}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(38px,7vw,62px);line-height:1;margin:6px 0 12px;text-wrap:balance;color:var(--bg2)}
+h2{font-family:var(--f-display);font-weight:400;font-size:clamp(26px,4.5vw,38px);line-height:1.05;margin:4px 0 10px;text-wrap:balance;color:var(--bg2)}
+h3{font-size:18px;margin:20px 0 8px;color:var(--bg2)}
 p{margin:0 0 12px;max-width:68ch}
-.lead{color:var(--on-bg-muted);font-size:18px}
-.goal{display:inline-block;background:var(--key-soft);color:var(--ink);border-left:6px solid var(--sun);border-radius:6px;padding:10px 14px;margin:6px 0 22px;font-weight:700}
+.lead{color:var(--muted);font-size:18px}
+.scene{display:block;width:100%;height:auto;border-radius:18px;margin:0 0 18px;box-shadow:0 8px 24px rgba(11,61,46,.18)}
+.scene.mini{margin:10px 0 14px;border-radius:14px;box-shadow:none}
+.goal{display:inline-block;background:var(--key-soft);color:var(--ink);border-left:6px solid var(--sun);border-radius:6px;padding:10px 14px;margin:6px 0 20px;font-weight:700}
 .route{list-style:none;margin:0;padding:0;position:relative;display:flex;flex-direction:column;gap:14px}
-.route::before{content:"";position:absolute;left:27px;top:20px;bottom:20px;width:6px;border-radius:3px;background:repeating-linear-gradient(to bottom,var(--ok) 0 14px,transparent 14px 24px);opacity:.55}
+.route::before{content:"";position:absolute;left:27px;top:20px;bottom:20px;width:6px;border-radius:3px;background:repeating-linear-gradient(to bottom,var(--leaf) 0 14px,transparent 14px 24px);background-size:6px 24px;opacity:.6;animation:flow 1.6s linear infinite}
+@keyframes flow{to{background-position:0 24px}}
 .stop{position:relative;display:flex;gap:16px;align-items:stretch}
-.num{flex:none;width:60px;height:60px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-size:28px;background:var(--surface);color:var(--ink);border:4px solid var(--ok);z-index:1;align-self:center}
-.stop.done .num{background:var(--ok);color:#fff}
-.stop.final .num{border-color:var(--sun);background:var(--sun)}
-.card{flex:1;text-align:left;cursor:pointer;background:var(--surface);color:var(--ink);border:3px solid transparent;border-radius:14px;padding:14px 18px;display:flex;flex-direction:column;gap:2px;transition:transform .15s,border-color .15s}
-.card:hover,.card:focus-visible{transform:translateY(-2px);border-color:var(--coral);outline:none}
-.card .t{font-family:var(--f-display);font-size:24px;line-height:1.1}
+.num{flex:none;width:60px;height:60px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-size:28px;background:#fff;color:var(--leaf-d);border:4px solid var(--leaf);z-index:1;align-self:center;overflow:hidden}
+.num svg{width:34px;height:44px;margin-top:6px}
+.stop.done .num{background:var(--ok-soft)}
+.stop.final .num{border-color:var(--sun);background:var(--sun);color:var(--bg2)}
+.card{flex:1;text-align:left;cursor:pointer;background:var(--surface);color:var(--ink);border:3px solid transparent;border-radius:14px;padding:14px 18px;display:flex;flex-direction:column;gap:2px;transition:transform .15s,border-color .15s,box-shadow .15s;box-shadow:0 2px 8px rgba(11,61,46,.1)}
+.card:hover,.card:focus-visible{transform:translateY(-2px);border-color:var(--leaf);box-shadow:0 8px 18px rgba(11,61,46,.16);outline:none}
+.card .t{font-family:var(--f-display);font-size:24px;line-height:1.1;color:var(--bg2)}
 .card .s{font-size:15px;color:var(--muted)}
 .card .m{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--key);font-weight:700;margin-top:4px}
 .stop.done .card .m{color:var(--ok)}
 .how{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:0 0 24px}
-.how div{background:rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;font-size:15px;color:var(--on-bg)}
-.how b{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--sun)}
-.back{background:none;border:0;color:var(--on-bg-muted);cursor:pointer;padding:6px 0;font-size:15px;text-decoration:underline}
-.paper{background:var(--surface);color:var(--ink);border-radius:12px;padding:18px;margin:12px 0}
+.how div{background:#fff;border-radius:10px;padding:10px 14px;font-size:15px;border:2px solid var(--line)}
+.how b{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--leaf-d)}
+.back{background:none;border:0;color:var(--leaf-d);cursor:pointer;padding:6px 0;font-size:15px;text-decoration:underline}
+.paper{background:var(--surface);color:var(--ink);border-radius:12px;padding:18px;margin:12px 0;border:2px solid var(--line)}
 .tip{display:flex;gap:10px;background:var(--key-soft);color:var(--ink);border-left:6px solid var(--sun);border-radius:6px;padding:10px 14px;margin:10px 0;font-size:16px}
 .item{background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:10px;padding:12px 14px;margin:10px 0}
 .item.ok{border-color:var(--ok);background:var(--ok-soft)}.item.bad{border-color:var(--bad);background:var(--bad-soft)}
-.item .q{margin:0 0 8px}.item .q b{color:var(--key);margin-right:6px}
+.item .q{margin:0 0 8px}.item .q b{color:var(--leaf-d);margin-right:6px}
 .opts{display:flex;flex-wrap:wrap;gap:8px}
-.opt{min-height:44px;padding:8px 14px;border-radius:8px;border:2px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;font-weight:700}
-.opt[aria-pressed=true]{background:var(--sea);border-color:var(--sea);color:#fff}
+.opt{min-height:44px;padding:8px 14px;border-radius:8px;border:2px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;font-weight:700;transition:transform .1s}
+.opt:active{transform:scale(.96)}
+.opt[aria-pressed=true]{background:var(--leaf-d);border-color:var(--leaf-d);color:#fff}
 .fb{font-size:15px;margin:8px 0 0;color:var(--ink)}
 .fb.bad{color:var(--bad);font-weight:700}.fb.good{color:var(--ok);font-weight:700}
-.btn{min-height:46px;padding:10px 18px;border-radius:9px;border:2px solid var(--coral);background:var(--coral);color:#fff;font-weight:700;cursor:pointer}
-.btn.ghost{background:transparent;color:var(--on-bg);border-color:rgba(255,255,255,.4)}
+.btn{min-height:46px;padding:10px 20px;border-radius:999px;border:2px solid var(--leaf-d);background:var(--leaf-d);color:#fff;font-weight:700;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(27,127,75,.35)}
+.btn.ghost{background:transparent;color:var(--leaf-d)}
 .btn.light{background:#fff;color:var(--ink);border-color:var(--line)}
 .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0}
-.result{font-weight:700;padding:8px 0}
-.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;padding:10px;border:2px dashed var(--on-bg-muted);border-radius:10px;margin:10px 0}
-.chip{min-height:44px;padding:8px 12px;border-radius:8px;background:#fff;color:var(--ink);border:2px solid var(--line);cursor:pointer;text-align:left;font-size:16px}
-.chip.sel{border-color:var(--sun);box-shadow:0 0 0 3px var(--sun)}.chip.ok{background:var(--ok-soft);border-color:var(--ok)}.chip.bad{background:var(--bad-soft);border-color:var(--bad)}
+.result{font-weight:700;padding:8px 0;display:flex;align-items:center;gap:10px;color:var(--key)}
+.result.win{color:var(--ok)}
+.result .pl{width:44px;height:58px;flex:none}
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;padding:10px;border:2px dashed var(--leaf);border-radius:10px;margin:10px 0;background:rgba(255,255,255,.55)}
+.chip{min-height:44px;padding:8px 12px;border-radius:8px;background:#fff;color:var(--ink);border:2px solid var(--line);cursor:pointer;text-align:left;font-size:16px;transition:transform .1s}
+.chip:hover{transform:translateY(-1px)}
+.chip.sel{border-color:var(--leaf-d);box-shadow:0 0 0 3px var(--lime)}.chip.ok{background:var(--ok-soft);border-color:var(--ok)}.chip.bad{background:var(--bad-soft);border-color:var(--bad)}
 .buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
 .bucket{background:var(--surface);color:var(--ink);border:3px solid var(--line);border-radius:12px;padding:10px;min-height:140px;cursor:pointer}
 .bucket h4{margin:0 0 8px;font-family:var(--f-display);font-weight:400;font-size:22px}
-.bucket.pro h4{color:var(--ok)}.bucket.con h4{color:var(--bad)}.bucket.str h4{color:var(--sea)}
-.bucket.armed{border-color:var(--sun);background:#FFF9E5}
+.bucket.pro h4{color:var(--ok)}.bucket.con h4{color:var(--bad)}.bucket.str h4{color:#0F7A82}
+.bucket.armed{border-color:var(--leaf-d);background:#F1FBE3;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 5px rgba(168,224,95,.6)}}
 .bucket .chips{display:flex;flex-direction:column;gap:6px}
 select,input[type=text],textarea{background:#fff;color:var(--ink);border:2px solid var(--line);border-radius:8px;padding:8px 10px;min-height:44px}
-input.gap{width:min(100%,230px);margin:0 4px;border-style:solid;border-width:0 0 3px;border-radius:0;background:#F1F6F5}
+input.gap{width:min(100%,230px);margin:0 4px;border-style:solid;border-width:0 0 3px;border-radius:0;background:#EEF8F0}
 input.gap.ok,select.ok{border-color:var(--ok);background:var(--ok-soft)}input.gap.bad,select.bad{border-color:var(--bad);background:var(--bad-soft)}
 textarea{width:100%;min-height:150px;line-height:1.6}
 .dlg p{max-width:none;line-height:2.1}
 .ord{display:flex;gap:8px;align-items:stretch;margin:6px 0}
 .ord .chip{flex:1;cursor:default}.ord .ar{display:flex;flex-direction:column;gap:4px}.ord .ar button{flex:1;min-width:44px;border:2px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);cursor:pointer;font-weight:700}
-.cards{background:var(--surface);color:var(--ink);border-radius:14px;padding:20px;text-align:center;font-size:22px;font-weight:700;min-height:120px;display:grid;place-items:center;border:4px solid var(--sea)}
+.cards{background:linear-gradient(135deg,#fff,#EFFADF);color:var(--ink);border-radius:14px;padding:20px;text-align:center;font-size:22px;font-weight:700;min-height:120px;display:grid;place-items:center;border:4px solid var(--leaf)}
+.cards.flip{animation:flip .4s}
+@keyframes flip{from{transform:rotateX(80deg);opacity:.3}to{transform:none;opacity:1}}
 .checks label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;color:var(--ink)}
 .checks input{width:24px;height:24px;flex:none;accent-color:var(--ok)}
 .wc{font-size:14px;color:var(--muted)}
 .pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
-.pair div{background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 14px;font-size:15px}
-.pair b{color:var(--coral)}
-@media print{body{background:#fff;color:#000}.top,.back,.btn{display:none}}
+.pair div{background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 14px;font-size:15px;border:2px solid var(--line)}
+.pair b{color:var(--leaf-d)}
+/* scene motion */
+.sway{transform-box:fill-box;transform-origin:50% 100%;animation:sway 4s ease-in-out infinite alternate}
+.sway.s2{animation-duration:5.2s;animation-delay:-1.5s}
+@keyframes sway{from{transform:rotate(-2.5deg)}to{transform:rotate(2.5deg)}}
+.grow{transform-box:fill-box;transform-origin:50% 100%;animation:growup .9s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes growup{from{transform:scale(.2)}to{transform:scale(1)}}
+.twinkle{animation:tw 2.4s ease-in-out infinite}
+@keyframes tw{50%{opacity:.2}}
+.sun{animation:sunp 5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes sunp{50%{transform:scale(1.08)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.leaves{display:none}}
+@media print{body{background:#fff}.top,.back,.btn,.leaves,.scene{display:none}}
 </style>
 </head>
 <body>
-<header class="top"><div class="top-in"><div class="brand">The Green Way<small>Unit 2 · Topic 1 · pp. 36–38</small></div><div class="prog"><span id="pt">0 / 7</span><div class="bar"><i id="pb" style="width:0%"></i></div></div></div></header>
+<div class="leaves" aria-hidden="true"></div>
+<header class="top"><div class="top-in"><div class="brand">The Green Way<small>Unit 2 · Topic 1 · pp. 36–38</small></div><div class="prog"><span id="hp"></span><span id="pt">0 / 7</span><div class="bar"><i id="pb" style="width:0%"></i></div></div></div></header>
 <main id="app"></main>
 <script>
 "use strict";
@@ -147,6 +176,45 @@ const DLG=[
 const TALK=["Will vertical gardens make our cities healthier?","Will people still own their own cars in 2050? Why (not)?","Will drones deliver most of our parcels in the future?","Will ‘smart’ homes help us to use less energy?","What are you going to do this week to protect the planet?","Are you going to travel by plane next summer? Why (not)?","Will cities have more green spaces in twenty years?","Are you going to buy a second-hand phone next time? Why (not)?","Will we all eat less meat in the future?","Is your school going to do something for the environment this year?"];
 const TOPICS={a:["Delivery drones","Drones bring parcels to your door."],b:["E-scooters in our town","People can rent e-scooters with an app."],c:["A green roof on our school","Plants and solar panels on top of the school building."]};
 
+
+/* ---------- artwork ---------- */
+function turbine(x,y,k,dur){return `<g transform="translate(${x},${y}) scale(${k})"><path d="M-2.5 0 L2.5 0 L1.2 -86 L-1.2 -86Z" fill="#fff"/><g transform="translate(0,-86)"><g><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="${dur}s" repeatCount="indefinite"/><path d="M0 0 L-3.5 -44 L3.5 -44Z" fill="#fff"/><path d="M0 0 L-3.5 -44 L3.5 -44Z" fill="#fff" transform="rotate(120)"/><path d="M0 0 L-3.5 -44 L3.5 -44Z" fill="#fff" transform="rotate(240)"/></g><circle r="5" fill="#E9F5EC" stroke="#9CCBB0" stroke-width="1.5"/></g></g>`}
+function tree(x,y,k,c1,c2,cls){return `<g transform="translate(${x},${y}) scale(${k})"><g class="sway ${cls||""}"><rect x="-3" y="-34" width="6" height="34" rx="3" fill="#7A5A3A"/><ellipse cx="0" cy="-48" rx="22" ry="24" fill="${c1}"/><ellipse cx="-12" cy="-40" rx="14" ry="15" fill="${c2}"/><ellipse cx="13" cy="-42" rx="13" ry="14" fill="${c2}"/></g></g>`}
+function bush(x,y,k,c){return `<g transform="translate(${x},${y}) scale(${k})"><g class="sway s2"><ellipse cx="0" cy="-9" rx="16" ry="11" fill="${c}"/><ellipse cx="-11" cy="-5" rx="9" ry="7" fill="#58B368"/><ellipse cx="11" cy="-5" rx="9" ry="7" fill="#58B368"/></g></g>`}
+function tower(x,w,h,top){ // glass tower with vertical garden strips
+  let g=`<rect x="${x}" y="${top-h}" width="${w}" height="${h}" rx="5" fill="#2B6F67"/><rect x="${x+3}" y="${top-h+3}" width="${w-6}" height="${h-6}" rx="3" fill="#3A8C7F" opacity=".6"/>`;
+  for(let r=0;r<Math.floor((h-18)/18);r++)for(let c=0;c<Math.floor((w-16)/16);c++)g+=`<rect x="${x+9+c*16}" y="${top-h+12+r*18}" width="9" height="10" rx="2" fill="${(r*7+c*3)%5===0?"#FFE98A":"#BFEFE2"}" opacity=".85"/>`;
+  for(let i=0;i<Math.floor(h/15);i++){const yy=top-h+10+i*15;g+=`<ellipse cx="${x+2}" cy="${yy}" rx="7" ry="5" fill="${i%2?"#4DB868":"#2E9E5B"}"/><ellipse cx="${x+w-2}" cy="${yy+7}" rx="7" ry="5" fill="${i%2?"#2E9E5B":"#6CCB5F"}"/>`}
+  g+=`<g class="sway"><ellipse cx="${x+w/2}" cy="${top-h-6}" rx="${w/2-3}" ry="9" fill="#4DB868"/><ellipse cx="${x+w/2-9}" cy="${top-h-11}" rx="8" ry="7" fill="#6CCB5F"/><ellipse cx="${x+w/2+8}" cy="${top-h-10}" rx="8" ry="6" fill="#2E9E5B"/></g>`;
+  return g}
+function panel(x,y,k){let g=`<g transform="translate(${x},${y}) scale(${k})"><path d="M0 0 L42 0 L34 -22 L-8 -22Z" fill="#1F5F8B"/><path d="M0 0 L42 0 L34 -22 L-8 -22Z" fill="none" stroke="#CFE9F5" stroke-width="1.4"/><path d="M14 0 L6 -22 M28 0 L20 -22 M-4 -11 L38 -11" stroke="#CFE9F5" stroke-width="1"/><rect x="-1" y="0" width="2" height="12" fill="#9AB8AE"/><rect x="40" y="0" width="2" height="12" fill="#9AB8AE"/><circle cx="20" cy="-14" r="3" fill="#fff" class="twinkle"/></g>`;return g}
+function drone(dur,y,delay){return `<g><animateTransform attributeName="transform" type="translate" values="-90,${y};990,${y}" dur="${dur}s" begin="${delay}s" repeatCount="indefinite"/><g><animateTransform attributeName="transform" type="translate" values="0,0;0,-9;0,0" dur="1.8s" repeatCount="indefinite"/><rect x="-16" y="-6" width="32" height="12" rx="6" fill="#fff" stroke="#2E9E5B" stroke-width="2"/><circle cx="0" cy="0" r="3" fill="#2E9E5B"/><path d="M-16 -6 L-26 -12 M16 -6 L26 -12" stroke="#4A6B5C" stroke-width="2"/><ellipse cx="-26" cy="-14" rx="11" ry="2.2" fill="#4A6B5C" opacity=".75"><animate attributeName="rx" values="11;4;11" dur=".18s" repeatCount="indefinite"/></ellipse><ellipse cx="26" cy="-14" rx="11" ry="2.2" fill="#4A6B5C" opacity=".75"><animate attributeName="rx" values="4;11;4" dur=".18s" repeatCount="indefinite"/></ellipse><path d="M-5 6 L-5 15 M5 6 L5 15" stroke="#4A6B5C" stroke-width="1.5"/><rect x="-10" y="15" width="20" height="14" rx="2" fill="#E3A94F"/><path d="M-10 21 L10 21" stroke="#B9822F" stroke-width="1.5"/></g></g>`}
+function tram(y,dur,rev){return `<g><animateTransform attributeName="transform" type="translate" values="${rev?"960,":"-200,"}${y};${rev?"-200,":"960,"}${y}" dur="${dur}s" repeatCount="indefinite"/><rect x="0" y="-20" width="120" height="20" rx="10" fill="#fff" stroke="#2E9E5B" stroke-width="2"/><path d="M0 -10 Q8 -20 20 -20" fill="none"/><rect x="12" y="-15" width="16" height="8" rx="3" fill="#7CCFE0"/><rect x="34" y="-15" width="16" height="8" rx="3" fill="#7CCFE0"/><rect x="56" y="-15" width="16" height="8" rx="3" fill="#7CCFE0"/><rect x="78" y="-15" width="16" height="8" rx="3" fill="#7CCFE0"/><rect x="100" y="-15" width="12" height="8" rx="3" fill="#7CCFE0"/><rect x="6" y="-4" width="108" height="3" fill="#A8E05F"/></g>`}
+function cloud(x,y,k,dur,delay){return `<g opacity=".92"><animateTransform attributeName="transform" type="translate" values="${x},${y};${x+140},${y}; ${x},${y}" dur="${dur}s" begin="${delay}s" repeatCount="indefinite"/><g transform="scale(${k})"><ellipse cx="0" cy="0" rx="44" ry="13" fill="#fff"/><ellipse cx="-14" cy="-11" rx="20" ry="15" fill="#fff"/><ellipse cx="14" cy="-15" rx="24" ry="18" fill="#fff"/></g></g>`}
+function plant(n){ // sprout with n leaves (0..7)
+  n=Math.max(0,Math.min(7,n));const h=10+n*6,top=62-h;let g=`<svg viewBox="0 0 60 78" aria-hidden="true"><path d="M16 62 L44 62 L40 76 L20 76Z" fill="#C97B4A"/><rect x="14" y="58" width="32" height="6" rx="3" fill="#E1925E"/><g class="grow"><path d="M30 60 Q${28+(n%2)*4} ${(60+top)/2} 30 ${top}" stroke="#2E9E5B" stroke-width="3.4" fill="none" stroke-linecap="round"/>`;
+  for(let i=0;i<n;i++){const left=i%2===0,y=56-i*6.2,x=left?30-9:30+9;g+=`<ellipse cx="${x}" cy="${y}" rx="9" ry="4.2" fill="${i%2?"#4DB868":"#6CCB5F"}" transform="rotate(${left?-28:28} ${x} ${y})"/>`}
+  if(n>=7)g+=`<circle cx="30" cy="${top-4}" r="7" fill="#FFD84D"/><circle cx="30" cy="${top-4}" r="3" fill="#F0745A"/>`;else if(n>0)g+=`<ellipse cx="30" cy="${top-3}" rx="4" ry="6" fill="#8EDB6B"/>`;
+  return g+`</g></svg>`}
+function scene(){return `<svg class="scene" viewBox="0 0 900 340" role="img" aria-label="A green city of the future: towers with vertical gardens, wind turbines, solar panels, a delivery drone and a tram">
+<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FD9C6"/><stop offset=".65" stop-color="#E4F6D6"/><stop offset="1" stop-color="#FFF4C7"/></linearGradient></defs>
+<rect width="900" height="340" fill="url(#sk)"/>
+<circle class="sun" cx="780" cy="72" r="46" fill="#FFE27A" opacity=".5"/><circle class="sun" cx="780" cy="72" r="32" fill="#FFD84D"/>
+${cloud(60,60,1,26,0)}${cloud(380,36,.8,32,-8)}${cloud(620,96,.6,28,-3)}
+<path d="M0 232 Q140 176 300 222 T610 214 T900 218 L900 340 L0 340Z" fill="#A5DDB1"/>
+${turbine(110,250,1.15,7)}${turbine(190,258,.85,9.5)}${turbine(830,246,1.05,8)}
+<path d="M0 252 Q200 226 420 246 T900 238 L900 340 L0 340Z" fill="#83CF92"/>
+${tower(300,56,118,262)}${tower(364,46,150,262)}${tower(418,64,98,262)}${tower(490,50,132,262)}${tower(546,58,86,262)}
+<rect x="0" y="198" width="900" height="6" fill="#4A7A68" opacity=".55"/><g fill="#4A7A68" opacity=".55"><rect x="150" y="204" width="7" height="60"/><rect x="450" y="204" width="7" height="60"/><rect x="760" y="204" width="7" height="60"/></g>
+${tram(198,15,false)}${drone(20,92,0)}${drone(27,138,-12)}
+<path d="M0 270 Q250 252 520 268 T900 262 L900 340 L0 340Z" fill="#5DBB63"/>
+<path d="M0 300 Q250 284 520 298 T900 292 L900 340 L0 340Z" fill="#3E9F56"/>
+${panel(610,296,1.05)}${panel(660,300,1.05)}${panel(712,296,1.05)}
+${tree(60,300,1,"#2E9E5B","#4DB868","")}${tree(235,296,.8,"#3BAE63","#6CCB5F","s2")}${tree(860,304,1.1,"#2E9E5B","#6CCB5F","")}${bush(150,312,1,"#2E9E5B")}${bush(790,316,1,"#3BAE63")}${bush(570,314,.9,"#2E9E5B")}
+<g transform="translate(330,318)"><rect x="0" y="-18" width="64" height="16" rx="8" fill="#fff" stroke="#2E9E5B" stroke-width="2"/><rect x="14" y="-27" width="34" height="12" rx="6" fill="#fff" stroke="#2E9E5B" stroke-width="2"/><circle cx="14" cy="-2" r="6" fill="#4A6B5C"/><circle cx="50" cy="-2" r="6" fill="#4A6B5C"/><rect x="74" y="-34" width="8" height="34" rx="3" fill="#A8E05F"/><circle cx="78" cy="-26" r="3" fill="#FFD84D" class="twinkle"/><path d="M64 -12 Q70 -12 74 -22" stroke="#4A6B5C" stroke-width="2" fill="none"/></g>
+</svg>`}
+function miniScene(){return `<svg class="scene mini" viewBox="0 0 900 110" aria-hidden="true"><defs><linearGradient id="sk2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ADFCB"/><stop offset="1" stop-color="#EAF8D8"/></linearGradient></defs><rect width="900" height="110" fill="url(#sk2)"/>${cloud(120,26,.6,30,0)}${cloud(560,20,.5,34,-9)}${turbine(70,86,.55,6)}${turbine(130,90,.4,8)}${turbine(820,86,.5,7)}<path d="M0 90 Q220 76 450 88 T900 84 L900 110 L0 110Z" fill="#5DBB63"/>${tree(250,98,.5,"#2E9E5B","#4DB868","")}${bush(330,102,.7,"#3BAE63")}${panel(560,100,.6)}${panel(590,102,.6)}${tree(700,100,.5,"#3BAE63","#6CCB5F","s2")}${drone(18,40,0)}</svg>`}
+
 /* ---------- stations ---------- */
 const stations=[
 {id:"read",t:"Read & check",s:"Newspaper article, p. 36 · true, false or not in the text",m:"≈ 10 min · reading"},
@@ -159,29 +227,29 @@ const stations=[
 {id:"cert",t:"My certificate",s:"Create a PDF with your results to upload",m:"≈ 3 min · results",cert:true}];
 const work=()=>stations.filter(s=>!s.cert);
 const doneCount=()=>work().filter(s=>S.done[s.id]).length;
-function progress(){const n=doneCount();$("#pt").textContent=n+" / "+work().length;$("#pb").style.width=(n/work().length*100)+"%"}
+function progress(){const n=doneCount();$("#hp").innerHTML=`<span class="hplant" style="display:inline-block">${plant(n)}</span>`;$("#pt").textContent=n+" / "+work().length;$("#pb").style.width=(n/work().length*100)+"%"}
 
 function home(){
   history.replaceState(null,"",location.pathname+location.search);
-  $("#app").innerHTML=`<div class="eyebrow">Unit 2 · Topic 1 · Student book pp. 36–38</div><h1>The Green Way</h1>
+  $("#app").innerHTML=`${scene()}<div class="eyebrow">Unit 2 · Topic 1 · Student book pp. 36–38</div><h1>The Green Way</h1>
   <p class="lead">Can plants on a motorway really clean the air of a big city? Work through six stations, write your own text and create your certificate.</p>
   <div class="goal">By the end you can describe the pros and cons of a technological development.</div>
   <div class="how"><div><b>Order</b>Do the stations in the order you like. Do the final task last.</div><div><b>Help</b>Use the hints, then check. You can try again as often as you like.</div><div><b>Material</b>Keep your student book open at pp. 36–38.</div></div>
-  <ol class="route">${stations.map((s,i)=>`<li class="stop ${S.done[s.id]?"done":""} ${s.final||s.cert?"final":""}"><span class="num">${s.cert?"★":S.done[s.id]?"✓":i+1}</span><button class="card" type="button" data-go="${s.id}"><span class="t">${esc(s.t)}</span><span class="s">${esc(s.s)}</span><span class="m">${S.done[s.id]&&!s.cert?"Done ✓":esc(s.m)}</span></button></li>`).join("")}</ol>
+  <ol class="route">${stations.map((s,i)=>`<li class="stop ${S.done[s.id]?"done":""} ${s.final||s.cert?"final":""}"><span class="num">${s.cert?"★":S.done[s.id]?plant(4):i+1}</span><button class="card" type="button" data-go="${s.id}"><span class="t">${esc(s.t)}</span><span class="s">${esc(s.s)}</span><span class="m">${S.done[s.id]&&!s.cert?"Done ✓":esc(s.m)}</span></button></li>`).join("")}</ol>
   <div class="row"><button class="btn ghost" type="button" data-act="reset">Start again</button></div>`;
   progress();window.scrollTo(0,0);
 }
 function open(id){
   const st=stations.find(s=>s.id===id);history.replaceState(null,"","#"+id);
-  $("#app").innerHTML=`<button class="back" type="button" data-act="home">← Back to the map</button><div class="eyebrow">${st.cert?"Last step":"Station "+(stations.indexOf(st)+1)+" of "+work().length}</div><h2>${esc(st.t)}</h2><div id="st">${R[id]()}</div>`;
+  $("#app").innerHTML=`<button class="back" type="button" data-act="home">← Back to the map</button><div class="eyebrow">${st.cert?"Last step":"Station "+(stations.indexOf(st)+1)+" of "+work().length}</div><h2>${esc(st.t)}</h2>${miniScene()}<div id="st">${R[id]()}</div>`;
   window.scrollTo(0,0);wc();
 }
 function finish(id,ok,msg){
   const r=$("#res");if(!r)return;
-  r.className="result";r.style.color=ok?"#8FE3B5":"#FFC845";r.textContent=msg;
+  r.className="result"+(ok?" win":"");r.style.color="";r.innerHTML=(ok?`<span class="pl">${plant(7)}</span>`:"")+`<span>${esc(msg)}</span>`;
   if(ok&&!S.done[id]){S.done[id]=1;save();progress()}
 }
-const chk=(id)=>`<div class="row"><button class="btn" type="button" data-act="check" data-st="${id}">Check</button><button class="btn ghost" type="button" data-act="show" data-st="${id}">Show answers</button></div><div id="res" class="result" role="status"></div>`;
+const chk=(id)=>`<div class="row"><button class="btn" type="button" data-act="check" data-st="${id}">Check</button></div><div id="res" class="result" role="status"></div>`;
 
 const R={};
 /* 1 read */
@@ -245,35 +313,35 @@ R.cert=()=>`<p>Fill in your name. The certificate shows which stations you have 
 <div class="paper"><label style="display:block;font-weight:700;margin-bottom:6px" for="cname">Your name</label><input id="cname" type="text" data-k="cname" style="width:100%;margin-bottom:12px" autocomplete="name" value="${esc(V("cname",""))}"><label style="display:block;font-weight:700;margin-bottom:6px" for="cclass">Class</label><input id="cclass" type="text" data-k="cclass" style="width:100%" value="${esc(V("cclass",""))}" placeholder="e.g. 10a"></div>
 <div class="row"><button class="btn" type="button" data-act="mkcert">Create my certificate</button><button class="btn light" type="button" data-act="dlpdf" id="dlpdf" hidden>Download PDF</button></div>
 <div id="cres" class="result" role="status"></div><div id="cprev"></div>`;
-function stationStatus(s){const z=(S.stat||{})[s.id]||{};if(!S.done[s.id])return["open","Not finished yet"];if(z.ok){return["ok",z.checks<=1?"Solved at the first check":"Solved after "+z.checks+" checks"]}if(z.shown)return["shown","Finished with answers shown"];return["ok","Finished"]}
+function stationStatus(s){const z=(S.stat||{})[s.id]||{};if(!S.done[s.id])return["open","Not finished yet"];return["ok",z.checks<=1?"Solved at the first check":"Solved after "+z.checks+" checks"]}
 function wrap(ctx,text,max){const out=[];text.split(/\n/).forEach(par=>{let line="";par.split(/\s+/).filter(Boolean).forEach(w=>{const t=line?line+" "+w:w;if(ctx.measureText(t).width>max&&line){out.push(line);line=w}else line=t});out.push(line)});return out}
 function drawCert(){
   const W=1654,H=2339,pages=[];const mk=()=>{const c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,W,H);return[c,x]};
   const F='"Atkinson Hyperlegible","Segoe UI",Arial,sans-serif',D='"Saira Stencil One",Impact,Arial,sans-serif';
   let [c,x]=mk();pages.push(c);
-  x.fillStyle="#0E3B4F";x.fillRect(0,0,W,330);x.fillStyle="#2E9E6A";x.fillRect(0,330,W,14);
-  x.fillStyle="#FFC845";x.font="700 30px "+F;x.fillText("UNIT 2 · TOPIC 1 · STUDENT BOOK PP. 36–38",90,110);
+  x.fillStyle="#0B3D2E";x.fillRect(0,0,W,330);x.fillStyle="#2E9E5B";x.fillRect(0,330,W,14);
+  x.fillStyle="#FFD84D";x.font="700 30px "+F;x.fillText("UNIT 2 · TOPIC 1 · STUDENT BOOK PP. 36–38",90,110);
   x.fillStyle="#fff";x.font="96px "+D;x.fillText("The Green Way",90,215);
   x.font="700 40px "+F;x.fillStyle="#A8C6CC";x.fillText("Learning path certificate",90,282);
   // seal
-  x.beginPath();x.arc(1450,170,100,0,7);x.fillStyle="#FFC845";x.fill();x.lineWidth=8;x.strokeStyle="#fff";x.stroke();
-  x.beginPath();x.moveTo(1405,170);x.lineTo(1440,208);x.lineTo(1500,128);x.lineWidth=18;x.lineCap="round";x.lineJoin="round";x.strokeStyle="#0E3B4F";x.stroke();
+  x.beginPath();x.arc(1450,170,100,0,7);x.fillStyle="#FFD84D";x.fill();x.lineWidth=8;x.strokeStyle="#fff";x.stroke();
+  x.beginPath();x.moveTo(1405,170);x.lineTo(1440,208);x.lineTo(1500,128);x.lineWidth=18;x.lineCap="round";x.lineJoin="round";x.strokeStyle="#0B3D2E";x.stroke();
   const name=V("cname","").trim()||"(no name)",cl=V("cclass","").trim(),d=new Date();
   const ds=String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+"."+d.getFullYear();
   x.fillStyle="#14262E";x.font="700 30px "+F;x.fillText("NAME",90,430);x.fillText("CLASS",900,430);x.fillText("DATE",1310,430);
   x.font="54px "+F;x.fillText(name.slice(0,26),90,495);x.fillText(cl.slice(0,8)||"–",900,495);x.font="44px "+F;x.fillText(ds,1310,492);
   x.fillStyle="#C3D1D0";x.fillRect(90,515,1474,3);
   const n=doneCount(),tot=work().length;
-  x.fillStyle="#14262E";x.font="700 40px "+F;const sh=work().filter(q=>S.done[q.id]&&!((S.stat||{})[q.id]||{}).ok&&((S.stat||{})[q.id]||{}).shown).length;x.fillText("Stations finished: "+n+" of "+tot+(sh?"  ("+sh+" with answers shown)":""),90,610);
-  x.fillStyle="#E3ECEA";x.fillRect(90,635,1474,34);x.fillStyle="#2E9E6A";x.fillRect(90,635,1474*n/tot,34);
+  x.fillStyle="#14262E";x.font="700 40px "+F;x.fillText("Stations finished: "+n+" of "+tot,90,610);
+  x.fillStyle="#E3ECEA";x.fillRect(90,635,1474,34);x.fillStyle="#2E9E5B";x.fillRect(90,635,1474*n/tot,34);
   let y=760;
   work().forEach((s,i)=>{const[st,txt]=stationStatus(s);
-    x.beginPath();x.arc(135,y-16,34,0,7);x.fillStyle=st==="open"?"#E3ECEA":st==="shown"?"#FFC845":"#2E9E6A";x.fill();
-    x.fillStyle=st==="open"?"#4E6268":st==="shown"?"#14262E":"#fff";x.font="700 38px "+F;x.textAlign="center";x.fillText(st==="open"?String(i+1):st==="shown"?"!":"✓",135,y-3);x.textAlign="left";
+    x.beginPath();x.arc(135,y-16,34,0,7);x.fillStyle=st==="open"?"#E3ECEA":"#2E9E5B";x.fill();
+    x.fillStyle=st==="open"?"#4E6268":"#fff";x.font="700 38px "+F;x.textAlign="center";x.fillText(st==="open"?String(i+1):"✓",135,y-3);x.textAlign="left";
     x.fillStyle="#14262E";x.font="700 42px "+F;x.fillText(s.t,205,y-4);
     x.fillStyle="#4E6268";x.font="34px "+F;x.fillText(txt,205,y+38);
     x.fillStyle="#E3ECEA";x.fillRect(205,y+62,1359,2);y+=118});
-  y+=20;x.fillStyle="#0E3B4F";x.font="700 44px "+F;x.fillText("My final text",90,y);
+  y+=20;x.fillStyle="#0B3D2E";x.font="700 44px "+F;x.fillText("My final text",90,y);
   const t=V("ftext","").trim();x.font="36px "+F;x.fillStyle="#14262E";
   const lines=t?wrap(x,t,1470):["(no text written yet)"];
   const wc=(t.match(/\S+/g)||[]).length;
@@ -311,24 +379,25 @@ function mkcert(){
 
 /* ---------- checks ---------- */
 const C={};
-C.read=(show)=>{let ok=0;$$(".item").forEach((it,i)=>{const r=READ[i];if(show)setV("read"+i,r[1]);const a=V("read"+i);it.classList.toggle("ok",a===r[1]);it.classList.toggle("bad",!!a&&a!==r[1]);const f=$(".fb",it);f.className="fb "+(a===r[1]?"good":"bad");f.textContent=a===r[1]?"✓ "+r[2]:(a?"✗ Look again. "+r[2].split(":")[0]+".":"Choose an answer.");if(a===r[1])ok++;if(show){$$("[data-k]",it).forEach(b=>b.setAttribute("aria-pressed",b.dataset.val===r[1]))}});return ok===READ.length};
-function sortCheck(key,items,show){const p=V(key,{});if(show){items.forEach((x,i)=>p[i]=x[1]);setV(key,p);setV(key+"sel",null)}let ok=0;items.forEach((x,i)=>{if(p[i]===x[1])ok++});return{ok,all:items.length,p}}
-C.proscons=(show)=>{const r=sortCheck("s2",SORT2,show);if(show){setV("s2q","b");rerender("sort2",()=>sortRender("s2",SORT2,[["pro","Pros 👍"],["con","Cons 👎"]]))}
-  $$("#sort2 .bucket .chip").forEach(c=>{const i=+c.dataset.chip.split(":")[1];c.classList.toggle("ok",r.p[i]===SORT2[i][1]);c.classList.toggle("bad",r.p[i]!==SORT2[i][1])});
-  const q=V("s2q"),it=$("#s2q");it.classList.toggle("ok",q==="b");it.classList.toggle("bad",!!q&&q!=="b");$(".fb",it).textContent=q==="b"?"✓ Yes: the scheme has not reduced the number of cars on the roads.":(q?"✗ Read the last paragraph again (lines 53–58).":"");$$("[data-k=s2q]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.val==="b"));
+const mark=(el,good,bad)=>{el.classList.toggle("ok",good);el.classList.toggle("bad",bad)};
+C.read=()=>{let ok=0;$$("#st .item").forEach((it,i)=>{const r=READ[i],a=V("read"+i),good=a===r[1];mark(it,good,!!a&&!good);const f=$(".fb",it);f.className="fb "+(good?"good":"bad");f.textContent=good?"✓ "+r[2]:(a?"✗ Not quite. Look again at "+r[2].split(":")[0].replace(/^Not in the text.*$/,"the text")+".":"Choose an answer.");if(good)ok++});return ok===READ.length};
+function sortCheck(key,items){const p=V(key,{});let ok=0;items.forEach((x,i)=>{if(p[i]===x[1])ok++});return{ok,all:items.length,p}}
+C.proscons=()=>{const r=sortCheck("s2",SORT2);
+  $$("#sort2 .bucket .chip").forEach(c=>{const i=+c.dataset.chip.split(":")[1];mark(c,r.p[i]===SORT2[i][1],r.p[i]!==SORT2[i][1])});
+  const q=V("s2q"),it=$("#s2q");mark(it,q==="b",!!q&&q!=="b");$(".fb",it).textContent=q==="b"?"✓ Yes: the scheme has not reduced the number of cars on the roads.":(q?"✗ Read the last paragraph again (lines 53–58).":"");
   return r.ok===r.all&&q==="b"};
-C.words=(show)=>{let ok=0;$$("select[data-k^=w]").forEach((s,i)=>{if(show){setV("w"+i,WANS[i]);s.value=WANS[i]}const a=V("w"+i);s.classList.toggle("ok",a===WANS[i]);s.classList.toggle("bad",!!a&&a!==WANS[i]);if(a===WANS[i])ok++});return ok===WANS.length};
-C.structure=(show)=>{const r=sortCheck("s4",SORT4,show);if(show){setV("ord",[0,1,2,3,4,5]);rerender("sort4",()=>sortRender("s4",SORT4,[["pro","Pros"],["con","Cons"],["str","Structure"]]));rerender("ord",ordRender)}
-  $$("#sort4 .bucket .chip").forEach(c=>{const i=+c.dataset.chip.split(":")[1];c.classList.toggle("ok",r.p[i]===SORT4[i][1]);c.classList.toggle("bad",r.p[i]!==SORT4[i][1])});
-  const o=ordArr();let oo=0;$$("#ord .ord").forEach((d,pos)=>{const good=o[pos]===pos;if(good)oo++;$(".chip",d).classList.toggle("ok",good);$(".chip",d).classList.toggle("bad",!good)});
+C.words=()=>{let ok=0;$$("select[data-k^=w]").forEach((s,i)=>{const a=V("w"+i);mark(s,a===WANS[i],!!a&&a!==WANS[i]);if(a===WANS[i])ok++});return ok===WANS.length};
+C.structure=()=>{const r=sortCheck("s4",SORT4);
+  $$("#sort4 .bucket .chip").forEach(c=>{const i=+c.dataset.chip.split(":")[1];mark(c,r.p[i]===SORT4[i][1],r.p[i]!==SORT4[i][1])});
+  const o=ordArr();let oo=0;$$("#ord .ord").forEach((d,pos)=>{const good=o[pos]===pos;if(good)oo++;mark($(".chip",d),good,!good)});
   return r.ok===r.all&&oo===o.length};
-C.future=(show)=>{let ok=0,tot=FA.length+DLG.filter(d=>d[1]).length;
-  $$("#st .item").forEach((it,i)=>{const f=FA[i];if(show){setV("fa"+i,String(f[2]));$("select",it).value=String(f[2])}const a=V("fa"+i);const good=a===String(f[2]);it.classList.toggle("ok",good);it.classList.toggle("bad",a!==undefined&&a!==""&&!good);$(".fb",it).className="fb "+(good?"good":"bad");$(".fb",it).textContent=good?"✓ "+f[3]:(a?"✗ Think again. "+f[3].split(",")[0]+"…":"");if(good)ok++});
-  $$("input.gap").forEach(inp=>{const k=+inp.dataset.k.slice(1);const d=DLG[k];if(show){setV("d"+k,d[2][0]);inp.value=d[2][0]}const a=norm(V("d"+k,""));const good=d[2].map(norm).includes(a);inp.classList.toggle("ok",good);inp.classList.toggle("bad",a!==""&&!good);if(good)ok++});return ok===tot};
+C.future=()=>{let ok=0,tot=FA.length+DLG.filter(d=>d[1]).length;
+  $$("#st .item").forEach((it,i)=>{const f=FA[i],a=V("fa"+i),good=a===String(f[2]);mark(it,good,!!a&&!good);const fb=$(".fb",it);fb.className="fb "+(good?"good":"bad");fb.textContent=good?"✓ "+f[3]:(a?"✗ Think again. Which future form fits this situation?":"");if(good)ok++});
+  $$("input.gap").forEach(inp=>{const k=+inp.dataset.k.slice(1),d=DLG[k],a=norm(V("d"+k,"")),good=d[2].map(norm).includes(a);mark(inp,good,a!==""&&!good);if(good)ok++});return ok===tot};
 C.talk=()=>[0,1,2].every(i=>V("tk"+i));
 C.final=()=>{const n=(V("ftext","").trim().match(/\S+/g)||[]).length;return n>=80&&[0,1,2,3,4,5].every(i=>V("fc"+i))};
 function rerender(id,fn){const e=$("#"+id);if(e)e.innerHTML=fn()}
-const MSG={read:["Perfect – all eight correct!","Not quite yet. Look at the red items and the line numbers."],proscons:["Great – you found all the arguments.","Some arguments are in the wrong box, or the question is still open."],words:["All gaps correct!","Some gaps are wrong – read the sentence again."],structure:["Excellent – phrases and paragraph are correct.","Not yet right. Check the phrases and the order of the sentences."],future:["Brilliant – all future forms are correct.","Some answers are wrong. Check the rules on p. 149."],talk:["Well done! Talk to your teacher if you want more practice.","Tick all three boxes when you have finished."],final:["Text finished – show it to your teacher or a partner.","Write at least 80 words and tick every item on the checklist."]};
+const MSG={read:["Perfect – all eight correct!","Not quite yet. Look at the red items and the line numbers in the text."],proscons:["Great – you found all the arguments.","Some arguments are in the wrong box, or the question is still open."],words:["All gaps correct!","Some gaps are wrong – read the sentence again."],structure:["Excellent – phrases and paragraph are correct.","Not yet right. Check the phrases and the order of the sentences."],future:["Brilliant – all future forms are correct.","Some answers are wrong. Check the rules on p. 149."],talk:["Well done! Talk to your teacher if you want more practice.","Tick all three boxes when you have finished."],final:["Text finished – show it to your teacher or a partner.","Write at least 80 words and tick every item on the checklist."]};
 
 /* ---------- events ---------- */
 document.addEventListener("click",e=>{
@@ -337,7 +406,7 @@ document.addEventListener("click",e=>{
   const a=t.dataset.act;
   if(a==="home")return home();
   if(a==="reset"){if(confirm("Delete all progress on this device?")){S={done:{},v:{},stat:{}};save();home()}return}
-  if(a==="check"||a==="show"){const id=t.dataset.st;const ok=C[id](a==="show");const st=(S.stat=S.stat||{});const z=st[id]=st[id]||{checks:0};if(a==="show"){z.shown=1}else{z.checks++;if(ok)z.ok=1}if(a==="show"){S.done[id]=1;save();progress();finish(id,true,"Answers shown. Read them carefully and try to understand each one.");return}save();finish(id,ok,MSG[id][ok?0:1]);return}
+  if(a==="check"){const id=t.dataset.st;const ok=C[id]();const st=(S.stat=S.stat||{});const z=st[id]=st[id]||{checks:0};z.checks++;if(ok)z.ok=1;save();finish(id,ok,MSG[id][ok?0:1]);return}
   if(a==="mkcert"){mkcert();return}
   if(a==="dlpdf"){if(!lastPdf)mkcert();const l=document.createElement("a");l.href=URL.createObjectURL(lastPdf);const n=(V("cname","").trim()||"certificate").replace(/[^\w\-äöüÄÖÜß]+/g,"_");l.download="GreenWay_"+n+".pdf";document.body.appendChild(l);l.click();l.remove();return}
   if(a==="next"){const cur=V("card",TALK[0]);let n;do{n=TALK[Math.floor(Math.random()*TALK.length)]}while(n===cur);setV("card",n);$("#card").textContent=n;return}
@@ -356,7 +425,8 @@ document.addEventListener("change",e=>{const t=e.target;if(t.matches("select[dat
 document.addEventListener("input",e=>{const t=e.target;if(t.matches("input.gap")||t.matches("input[type=text][data-k]")){setV(t.dataset.k,t.value)}else if(t.dataset.text){setV(t.dataset.text,t.value);wc()}});
 function wc(){const x=$("#wc");if(x){const n=(V("ftext","").trim().match(/\S+/g)||[]).length;x.textContent=n+" words"}}
 window.addEventListener("hashchange",()=>{const id=location.hash.slice(1);if(id&&R[id])open(id);else if(!id)home()});
-(function init(){const id=location.hash.slice(1);if(id&&R[id])open(id);else home();progress()})();
+(function init(){const L=$(".leaves");for(let i=0;i<9;i++){const e=document.createElement("i");e.style.left=(5+i*11)+"%";e.style.animationDuration=(16+i*2.3)+"s";e.style.animationDelay=(-i*3.1)+"s";e.style.transform="scale("+(.7+(i%3)*.4)+")";L.appendChild(e)}
+  if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)setTimeout(()=>$$("svg.scene").forEach(v=>v.pauseAnimations&&v.pauseAnimations()),50);const id=location.hash.slice(1);if(id&&R[id])open(id);else home();progress()})();
 </script>
 </body>
 </html>
